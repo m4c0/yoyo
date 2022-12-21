@@ -10,6 +10,7 @@ auto yoyo() {
   m->add_part("ce_reader");
   m->add_part("istr_reader");
   m->add_part("ostr_writer");
+  m->add_part("span_reader");
   m->add_part("subreader");
   m->add_impl("ce_reader-test");
   return m;

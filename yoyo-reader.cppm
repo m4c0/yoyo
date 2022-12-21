@@ -28,6 +28,8 @@ export class reader {
   friend class subreader;
 
 public:
+  virtual ~reader() = default;
+
   [[nodiscard]] virtual bool eof() const = 0;
   [[nodiscard]] virtual bool seekg(int pos, seek_mode mode) = 0;
   [[nodiscard]] virtual unsigned tellg() const = 0;

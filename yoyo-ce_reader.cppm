@@ -1,69 +1,73 @@
 module;
-#include <array>
-#include <optional>
+#include <stdint.h>
 
 export module yoyo:ce_reader;
+import missingno;
 import :reader;
 
 namespace yoyo {
 export template <auto N> class ce_reader : public reader {
-  std::array<uint8_t, N> m_data;
+  uint8_t m_data[N];
   unsigned m_pos{};
 
 public:
   template <typename... Tp>
   constexpr explicit ce_reader(Tp... data)
       : m_data{static_cast<uint8_t>(data)...} {}
-  constexpr explicit ce_reader(const char (&data)[N + 1]) { // NOLINT
-    std::copy(data, data + N, m_data.begin());
+  constexpr explicit ce_reader(const char (&data)[N + 1]) {
+    for (auto i = 0U; i < N; i++) {
+      m_data[i] = data[i];
+    }
   }
 
-  [[nodiscard]] constexpr bool read(void * /*buffer*/,
-                                    unsigned /*len*/) override {
-    return false;
+  [[nodiscard]] constexpr req<void> read(void * /*buffer*/,
+                                         unsigned /*len*/) noexcept override {
+    return req<void>::failed("CE doesn't support reading from generic pointer");
   }
-  [[nodiscard]] constexpr bool read(uint8_t *buffer, unsigned len) override {
-    if (m_pos + len > N)
-      return false;
-    std::copy(m_data.begin() + m_pos, m_data.begin() + m_pos + len, buffer);
-    m_pos += len;
-    return true;
+  [[nodiscard]] constexpr req<void> read(uint8_t *buffer,
+                                         unsigned len) noexcept override {
+    req<void> res;
+    for (auto i = 0U; i < len; i++) {
+      res = res.fmap([this] { return read_u8(); }).map([&](auto b) {
+        buffer[i] = b;
+      });
+    }
+    return res;
   }
-  [[nodiscard]] constexpr std::optional<uint8_t> read_u8() override {
+  [[nodiscard]] constexpr req<uint8_t> read_u8() noexcept override {
     if (eof())
-      return {};
-    return m_data.at(m_pos++);
+      return req<uint8_t>::failed("Buffer underflow");
+    return m_data[m_pos++];
   }
-  [[nodiscard]] constexpr std::optional<uint16_t> read_u16() override {
-    if (m_pos + sizeof(uint16_t) > N)
-      return {};
-
+  [[nodiscard]] constexpr req<uint16_t> read_u16() noexcept override {
     constexpr const auto u8_bitsize = 8U;
 
-    unsigned b = *read_u8();
-    unsigned a = *read_u8();
-    return (a << u8_bitsize) | b;
+    return read_u8().fmap([this](auto b) {
+      return read_u8().map(
+          [b](auto a) -> uint16_t { return (a << u8_bitsize) | b; });
+    });
   }
-  [[nodiscard]] constexpr std::optional<uint32_t> read_u32() override {
-    if (m_pos + sizeof(uint32_t) > N)
-      return {};
-
+  [[nodiscard]] constexpr req<uint32_t> read_u32() noexcept override {
     constexpr const auto u16_bitsize = 16U;
 
-    unsigned b = *read_u16();
-    unsigned a = *read_u16();
-    return (a << u16_bitsize) | b;
+    return read_u16().fmap([this](auto b) {
+      return read_u16().map(
+          [b](auto a) -> uint32_t { return (a << u16_bitsize) | b; });
+    });
   }
-  [[nodiscard]] constexpr bool eof() const override { return m_pos >= N; }
-  [[nodiscard]] constexpr bool seekg(unsigned pos) {
+  [[nodiscard]] constexpr bool eof() const noexcept override {
+    return m_pos >= N;
+  }
+  [[nodiscard]] constexpr req<void> seekg(unsigned pos) {
     if (pos < 0)
-      return false;
+      return req<void>::failed("Attempt of seeking before start of buffer");
     if (pos > N)
-      return false;
+      return req<void>::failed("Attempt of seeking past end of buffer");
     m_pos = pos;
-    return true;
+    return {};
   }
-  [[nodiscard]] constexpr bool seekg(int pos, seek_mode mode) override {
+  [[nodiscard]] constexpr req<void> seekg(int pos,
+                                          seek_mode mode) noexcept override {
     switch (mode) {
     case seek_mode::set:
       return seekg(pos);
@@ -73,7 +77,9 @@ public:
       return seekg(N + pos);
     }
   }
-  [[nodiscard]] constexpr unsigned tellg() const override { return m_pos; }
+  [[nodiscard]] constexpr unsigned tellg() const noexcept override {
+    return m_pos;
+  }
 };
 export template <typename... Tp> ce_reader(Tp...) -> ce_reader<sizeof...(Tp)>;
 export template <auto N>

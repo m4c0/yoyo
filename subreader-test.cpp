@@ -1,100 +1,139 @@
-#include <array>
 #include <cassert>
-#include <optional>
-#include <sstream>
+#include <string>
 
 import yoyo;
 
 using namespace yoyo;
 
+static auto fail() { return false; }
+
 class holder {
-  std::istringstream m_str;
-  istr_reader m_reader;
-  std::optional<subreader> m_sub;
+  ce_reader<14> m_reader{"this is a test"};
+  mno::req<subreader> m_sub;
 
 public:
+  static constexpr auto whole_len = 14;
   static constexpr auto start_pos = 5; // "is a"
   static constexpr auto len = 4;
 
-  holder() : holder("this is a test", start_pos, len) {}
-  holder(const char *text, unsigned start, unsigned len)
-      : m_str(text), m_reader(m_str),
-        m_sub(subreader::seek_and_create(&m_reader, start, len)) {}
+  constexpr holder() : holder(start_pos, len) {}
+  constexpr holder(unsigned start, unsigned len)
+      : m_sub(subreader::seek_and_create(&m_reader, start, len)) {}
 
-  [[nodiscard]] constexpr explicit operator bool() const noexcept {
-    return m_sub.has_value();
+  constexpr auto &sub() { return m_sub; }
+  constexpr const auto &underlying() const { return m_reader; }
+
+  constexpr auto assert_position(bool eof, unsigned pos) {
+    return m_sub.map(
+        [=](auto sub) { return (sub.tellg() == pos) && (sub.eof() == eof); });
   }
-  [[nodiscard]] constexpr auto *operator->() noexcept { return &m_sub.value(); }
 
-  [[nodiscard]] constexpr auto &strstream() noexcept { return m_str; }
+  template <auto N> constexpr auto read(char (&buf)[N]) {
+    return m_sub.fmap([&](auto sub) { return sub.read(buf, N); });
+  }
+
+  constexpr auto seek(auto offs) {
+    return m_sub.fmap([offs](auto sub) { return sub.seekg(offs); });
+  }
+  constexpr auto seek(auto offs, auto mode) {
+    return m_sub.fmap([offs, mode](auto sub) { return sub.seekg(offs, mode); });
+  }
 };
 
-static void assert_position(holder &h, bool eof, unsigned pos) {
-  assert(static_cast<bool>(h));
-  assert(h->tellg() == pos);
-  assert(h->eof() == eof);
-}
-static void assert_position(bool result, holder &h, bool eof, unsigned pos) {
-  assert(result);
-  assert_position(h, eof, pos);
+static constexpr auto assert_position(holder &h, bool eof, unsigned pos) {
+  return [&h, eof, pos] { return h.assert_position(eof, pos); };
 }
 
-int main() {
-  { // seeks stream in ctor
-    holder h{"test", 2, 1};
-    assert(static_cast<bool>(h));
-    assert(static_cast<unsigned>(h.strstream().tellg()) == 2);
-  }
-  { // creates an invalid instance if ctor can't seek
-    holder h{"test", holder::len + 1, 1};
-    assert(!static_cast<bool>(h));
-  }
-  { // can tell current position from start
-    holder h;
-    assert_position(h, false, 0);
-  }
-  { // doesn't seek before limit
-    holder h;
-    assert_position(!h->seekg(-1), h, false, 0);
-  }
-  { // doesn't seek past limit
-    holder h;
-    assert_position(!h->seekg(holder::len + 1), h, false, 0);
-  }
-  { // seeks properly
-    holder h;
-    assert_position(h->seekg(2), h, false, 2);
-  }
-  { // seeks to current pos
-    holder h;
-    assert_position(h->seekg(0), h, false, 0);
-  }
-  { // seeks from current position
-    holder h;
-    assert_position(h->seekg(2), h, false, 2);
-    assert_position(h->seekg(1, seek_mode::current), h, false, 3);
-    assert_position(h->seekg(-2, seek_mode::current), h, false, 1);
-  }
-  { // seeks from end
-    holder h;
-    assert_position(h->seekg(-1, seek_mode::end), h, false, 3);
-  }
-  { // reads
-    holder h;
-    std::string buf{"12"};
-    assert(h->read(buf.data(), buf.size()));
-    assert(buf == "is");
-  }
-  { // reads all
-    holder h;
-    std::string buf{"1234"};
-    assert(h->read(buf.data(), buf.size()));
-    assert(buf == "is a");
-  }
-  { // doesnt read past limit
-    holder h;
-    std::string buf{"12345"};
-    assert(!h->read(buf.data(), buf.size()));
-    assert(buf == "12345");
-  }
-}
+// seeks stream in ctor
+static_assert([] {
+  holder h{2, 1};
+  return h.sub()
+      .map([&](auto) { return h.underlying().tellg() == 2; })
+      .unwrap(false);
+}());
+
+// creates an invalid instance if ctor can't seek
+static_assert(holder{holder::whole_len + 1, 1}
+                  .sub()
+                  .map([](auto) { return fail(); })
+                  .unwrap(true));
+
+// can tell current position from start
+static_assert(holder{}.assert_position(false, 0).unwrap(false));
+
+// doesn't seek before limit
+static_assert([] {
+  holder h{};
+  auto s = h.seek(-1).map(fail).otherwise(true);
+  auto p = h.assert_position(false, 0);
+  return s.unwrap(false) && p.unwrap(false);
+}());
+
+// doesn't seek past limit
+static_assert([] {
+  holder h{};
+  auto s = h.seek(holder::len + 1).map(fail).otherwise(true);
+  auto p = h.assert_position(false, 0);
+  return s.unwrap(false) && p.unwrap(false);
+}());
+
+// seeks properly
+static_assert([] {
+  holder h;
+  return h.seek(2).fmap(assert_position(h, false, 2)).unwrap(false);
+}());
+
+// seeks to current pos
+static_assert([] {
+  holder h;
+  return h.seek(0).fmap(assert_position(h, false, 0)).unwrap(false);
+}());
+
+// seeks from current position
+static_assert([] {
+  holder h;
+  return h.seek(2).fmap(assert_position(h, false, 2)).unwrap(false) &&
+         h.seek(1, seek_mode::current)
+             .fmap(assert_position(h, false, 3))
+             .unwrap(false) &&
+         h.seek(-2, seek_mode::current)
+             .fmap(assert_position(h, false, 1))
+             .unwrap(false);
+}());
+
+// seeks from end
+static_assert([] {
+  holder h;
+  return h.seek(-1, seek_mode::end)
+      .fmap(assert_position(h, false, holder::len - 1))
+      .unwrap(false);
+}());
+
+// reads
+static_assert([] {
+  char buf[] = "12";
+  return holder{}
+      .read(buf)
+      .map([&] { return std::string_view{buf} == "is"; })
+      .unwrap(false);
+});
+
+// reads all
+static_assert([] {
+  char buf[] = "1234";
+  return holder{}
+      .read(buf)
+      .map([&] { return std::string_view{buf} == "is a"; })
+      .unwrap(false);
+});
+
+// doesnt read past limit
+static_assert([] {
+  char buf[] = "12345";
+  holder h;
+  return h.read(buf).map(fail).unwrap(true) &&
+
+         std::string_view{buf} == "12345";
+});
+
+int main() {}

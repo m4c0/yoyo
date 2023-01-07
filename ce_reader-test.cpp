@@ -24,14 +24,16 @@ static_assert([] {
 static_assert([] {
   constexpr const auto valid_pos = 10;
   ce_reader dat = png;
-  return dat.seekg(valid_pos) && !dat.eof() && (dat.tellg() == valid_pos);
+  return dat.seekg(valid_pos)
+      .map([&] { return !dat.eof() && (dat.tellg() == valid_pos); })
+      .unwrap(false);
 }());
 
 // Test if we cannot seek past end
 static_assert([] {
   constexpr const auto invalid_pos = 1000;
   ce_reader dat = png;
-  return !dat.seekg(invalid_pos);
+  return !dat.seekg(invalid_pos).map([] { return true; }).unwrap(false);
 }());
 
 // Test if we can seek backwards
@@ -39,15 +41,17 @@ static_assert([] {
   constexpr const auto valid_pos = 10;
   constexpr const auto valid_rewind = 3;
   ce_reader dat = png;
-  return dat.seekg(valid_pos) && dat.seekg(valid_rewind) && !dat.eof() &&
-         (dat.tellg() == valid_rewind);
+  return dat.seekg(valid_pos)
+      .fmap([&] { return dat.seekg(valid_rewind); })
+      .map([&] { return !dat.eof() && (dat.tellg() == valid_rewind); })
+      .unwrap(false);
 }());
 
 // Test if we cannot seek before start
 static_assert([] {
   constexpr const auto invalid_pos = -1;
   ce_reader dat = png;
-  return !dat.seekg(invalid_pos);
+  return dat.seekg(invalid_pos).map([] { return false; }).unwrap(true);
 }());
 
 // Test if we can seek using mode::cur
@@ -58,14 +62,19 @@ static_assert([] {
   constexpr const auto final_pos = any_pos + delta_fwd + delta_rev;
 
   ce_reader dat = png;
-  return dat.seekg(any_pos) && dat.seekg(delta_fwd, seek_mode::current) &&
-         dat.seekg(delta_rev, seek_mode::current) && (dat.tellg() == final_pos);
+  return dat.seekg(any_pos)
+      .fmap([&] { return dat.seekg(delta_fwd, seek_mode::current); })
+      .fmap([&] { return dat.seekg(delta_rev, seek_mode::current); })
+      .map([&] { return dat.tellg() == final_pos; })
+      .unwrap(false);
 }());
 
 // Test if we can seek using mode::end
 static_assert([] {
   ce_reader dat('R', 'I', 'F', 'F');
-  return dat.seekg(-1, seek_mode::end) && dat.tellg() == 3;
+  return dat.seekg(-1, seek_mode::end)
+      .map([&] { return dat.tellg() == 3; })
+      .unwrap(false);
 }());
 
 // Test if it seeks when reading
@@ -73,7 +82,10 @@ static_assert([] {
   constexpr const auto final_pos = 7;
 
   ce_reader dat = png;
-  return dat.seekg(3) && dat.read_u32() && dat.tellg() == final_pos;
+  return dat.seekg(3)
+      .fmap([&] { return dat.read_u32(); })
+      .map([&](auto) { return dat.tellg() == final_pos; })
+      .unwrap(false);
 }());
 
 // Test if we can read in proper endianness
@@ -82,25 +94,39 @@ static_assert([] {
   constexpr const auto ihdr_pos = 8;
 
   ce_reader dat = png;
-  return dat.seekg(ihdr_pos) && (dat.read_u32_be() == expected);
+  return dat.seekg(ihdr_pos)
+      .fmap([&] { return dat.read_u32_be(); })
+      .map([](auto d) { return d == expected; })
+      .unwrap(false);
 }());
 static_assert([] {
-  return ce_reader('R', 'I', 'F', 'F').read_u32() == 'FFIR';
+  return ce_reader('R', 'I', 'F', 'F')
+      .read_u32()
+      .map([](auto d) { return d == 'FFIR'; })
+      .unwrap(false);
 }());
 
 // Test if we don't read past the end
 static_assert([] {
   ce_reader dat('R', 'I', 'F', 'F');
-  return dat.seekg(2) && !dat.read_u32();
+  return dat.seekg(2)
+      .fmap([&] { return dat.read_u32(); })
+      .map([](auto) { return false; })
+      .unwrap(true);
 }());
 
 // Test if we can build from a string literal
-static_assert([] { return ce_reader("RIFF").read_u32() == 'FFIR'; }());
+static_assert([] {
+  return ce_reader("RIFF")
+      .read_u32()
+      .map([](auto d) { return d == 'FFIR'; })
+      .unwrap(false);
+}());
 
 // Test if we can seek to EOF
 static_assert([] {
   ce_reader dat("RIFF");
-  return dat.seekg(4) && dat.eof();
+  return dat.seekg(4).map([&] { return dat.eof(); }).unwrap(false);
 }());
 
 int main() {}

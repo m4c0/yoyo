@@ -37,7 +37,7 @@ public:
   [[nodiscard]] constexpr req<uint8_t> read_u8() noexcept override {
     if (eof())
       return req<uint8_t>::failed("Buffer underflow");
-    return m_data[m_pos++];
+    return req<uint8_t>{m_data[m_pos++]};
   }
   [[nodiscard]] constexpr req<uint16_t> read_u16() noexcept override {
     constexpr const auto u8_bitsize = 8U;

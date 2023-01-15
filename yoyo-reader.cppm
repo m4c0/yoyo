@@ -50,9 +50,21 @@ public:
   }
   [[nodiscard]] virtual mno::req<void> read(void *buffer,
                                             unsigned len) noexcept = 0;
-  [[nodiscard]] virtual mno::req<uint8_t> read_u8() noexcept = 0;
-  [[nodiscard]] virtual mno::req<uint16_t> read_u16() noexcept = 0;
-  [[nodiscard]] virtual mno::req<uint32_t> read_u32() noexcept = 0;
+
+  template <typename T> [[nodiscard]] inline mno::req<T> read() noexcept {
+    T res;
+    return read(&res, sizeof(res)).map([&] { return res; });
+  }
+
+  [[nodiscard]] virtual mno::req<uint8_t> read_u8() noexcept {
+    return read<uint8_t>();
+  }
+  [[nodiscard]] virtual mno::req<uint16_t> read_u16() noexcept {
+    return read<uint16_t>();
+  }
+  [[nodiscard]] virtual mno::req<uint32_t> read_u32() noexcept {
+    return read<uint32_t>();
+  }
 
   [[nodiscard]] constexpr mno::req<uint16_t> read_u16_be() noexcept {
     return read_u16().map(details::flip16);

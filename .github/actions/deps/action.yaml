@@ -4,6 +4,10 @@ runs:
   steps:
     - uses: actions/checkout@v3
       with:
+        repository: m4c0/hai
+        path: hai
+    - uses: actions/checkout@v3
+      with:
         repository: m4c0/missingno
         path: missingno
     - uses: actions/checkout@v3

@@ -7,7 +7,7 @@ import hai;
 import missingno;
 
 namespace yoyo {
-class file_reader : public reader {
+export class file_reader : public reader {
   hai::c_file m_f;
 
   [[nodiscard]] static constexpr auto whence_of(seek_mode mode) noexcept {

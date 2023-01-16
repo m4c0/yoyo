@@ -1,5 +1,5 @@
 module;
-#include <optional>
+#include <stdint.h>
 
 export module yoyo:subreader;
 import missingno;

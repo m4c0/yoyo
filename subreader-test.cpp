@@ -1,6 +1,3 @@
-#include <cassert>
-#include <string>
-
 import yoyo;
 
 using namespace yoyo;
@@ -114,7 +111,7 @@ static_assert([] {
   char buf[] = "12";
   return holder{}
       .read(buf)
-      .map([&] { return std::string_view{buf} == "is"; })
+      .map([&] { return buf[0] == 'i' && buf[1] == 's'; })
       .unwrap(false);
 });
 
@@ -123,7 +120,9 @@ static_assert([] {
   char buf[] = "1234";
   return holder{}
       .read(buf)
-      .map([&] { return std::string_view{buf} == "is a"; })
+      .map([&] {
+        return buf[0] == 'i' && buf[1] == 's' && buf[2] == ' ' && buf[3] == 'a';
+      })
       .unwrap(false);
 });
 
@@ -131,9 +130,8 @@ static_assert([] {
 static_assert([] {
   char buf[] = "12345";
   holder h;
-  return h.read(buf).map(fail).unwrap(true) &&
-
-         std::string_view{buf} == "12345";
+  return h.read(buf).map(fail).unwrap(true) && buf[0] == '1' && buf[1] == '2' &&
+         buf[2] == '3' && buf[3] == '4' && buf[4] == '5';
 });
 
 int main() {}

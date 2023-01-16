@@ -2,7 +2,6 @@ module;
 #include <stdint.h>
 
 export module yoyo:ce_reader;
-import missingno;
 import :reader;
 
 namespace yoyo {
@@ -35,9 +34,9 @@ public:
     return res;
   }
   [[nodiscard]] constexpr req<uint8_t> read_u8() noexcept override {
-    if (eof())
-      return req<uint8_t>::failed("Buffer underflow");
-    return req<uint8_t>{m_data[m_pos++]};
+    return eof()
+        .assert([](auto eof) { return !eof; }, "Buffer underflow")
+        .map([&](auto) { return m_data[m_pos++]; });
   }
   [[nodiscard]] constexpr req<uint16_t> read_u16() noexcept override {
     constexpr const auto u8_bitsize = 8U;
@@ -55,8 +54,8 @@ public:
           [b](auto a) -> uint32_t { return (a << u16_bitsize) | b; });
     });
   }
-  [[nodiscard]] constexpr bool eof() const noexcept override {
-    return m_pos >= N;
+  [[nodiscard]] constexpr req<bool> eof() const noexcept override {
+    return req<bool>{m_pos >= N};
   }
   [[nodiscard]] constexpr req<void> seekg(unsigned pos) {
     if (pos < 0)
@@ -77,8 +76,8 @@ public:
       return seekg(N + pos);
     }
   }
-  [[nodiscard]] constexpr unsigned tellg() const noexcept override {
-    return m_pos;
+  [[nodiscard]] constexpr req<unsigned> tellg() const noexcept override {
+    return req<unsigned>{m_pos};
   }
 };
 export template <typename... Tp> ce_reader(Tp...) -> ce_reader<sizeof...(Tp)>;

@@ -13,7 +13,7 @@ static constexpr const ce_reader png{
 // Test initial state
 static_assert([] {
   ce_reader dat = png;
-  return !dat.eof() && (dat.tellg() == 0);
+  return (dat.eof() == false) && (dat.tellg() == 0);
 }());
 
 // Test if we can seek
@@ -21,7 +21,7 @@ static_assert([] {
   constexpr const auto valid_pos = 10;
   ce_reader dat = png;
   return dat.seekg(valid_pos)
-      .map([&] { return !dat.eof() && (dat.tellg() == valid_pos); })
+      .map([&] { return (dat.eof() == false) && (dat.tellg() == valid_pos); })
       .unwrap(false);
 }());
 
@@ -39,7 +39,8 @@ static_assert([] {
   ce_reader dat = png;
   return dat.seekg(valid_pos)
       .fmap([&] { return dat.seekg(valid_rewind); })
-      .map([&] { return !dat.eof() && (dat.tellg() == valid_rewind); })
+      .map(
+          [&] { return (dat.eof() == false) && (dat.tellg() == valid_rewind); })
       .unwrap(false);
 }());
 
@@ -122,7 +123,7 @@ static_assert([] {
 // Test if we can seek to EOF
 static_assert([] {
   ce_reader dat("RIFF");
-  return dat.seekg(4).map([&] { return dat.eof(); }).unwrap(false);
+  return dat.seekg(4).fmap([&] { return dat.eof(); }).unwrap(false);
 }());
 
 int main() {}

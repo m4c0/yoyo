@@ -35,41 +35,38 @@ protected:
 public:
   virtual ~reader() = default;
 
-  [[nodiscard]] virtual bool eof() const noexcept = 0;
-  [[nodiscard]] virtual mno::req<void> seekg(int pos,
-                                             seek_mode mode) noexcept = 0;
-  [[nodiscard]] virtual unsigned tellg() const noexcept = 0;
+  [[nodiscard]] virtual req<bool> eof() const noexcept = 0;
+  [[nodiscard]] virtual req<void> seekg(int pos, seek_mode mode) noexcept = 0;
+  [[nodiscard]] virtual req<unsigned> tellg() const noexcept = 0;
 
-  [[nodiscard]] constexpr mno::req<void> seekg(unsigned pos) noexcept {
+  [[nodiscard]] constexpr req<void> seekg(unsigned pos) noexcept {
     return seekg(static_cast<int>(pos), seek_mode::set);
   }
 
-  [[nodiscard]] virtual mno::req<void> read(uint8_t *buffer,
-                                            unsigned len) noexcept {
+  [[nodiscard]] virtual req<void> read(uint8_t *buffer, unsigned len) noexcept {
     return read(static_cast<void *>(buffer), len);
   }
-  [[nodiscard]] virtual mno::req<void> read(void *buffer,
-                                            unsigned len) noexcept = 0;
+  [[nodiscard]] virtual req<void> read(void *buffer, unsigned len) noexcept = 0;
 
-  template <typename T> [[nodiscard]] inline mno::req<T> read() noexcept {
+  template <typename T> [[nodiscard]] inline req<T> read() noexcept {
     T res;
     return read(&res, sizeof(res)).map([&] { return res; });
   }
 
-  [[nodiscard]] virtual mno::req<uint8_t> read_u8() noexcept {
+  [[nodiscard]] virtual req<uint8_t> read_u8() noexcept {
     return read<uint8_t>();
   }
-  [[nodiscard]] virtual mno::req<uint16_t> read_u16() noexcept {
+  [[nodiscard]] virtual req<uint16_t> read_u16() noexcept {
     return read<uint16_t>();
   }
-  [[nodiscard]] virtual mno::req<uint32_t> read_u32() noexcept {
+  [[nodiscard]] virtual req<uint32_t> read_u32() noexcept {
     return read<uint32_t>();
   }
 
-  [[nodiscard]] constexpr mno::req<uint16_t> read_u16_be() noexcept {
+  [[nodiscard]] constexpr req<uint16_t> read_u16_be() noexcept {
     return read_u16().map(details::flip16);
   }
-  [[nodiscard]] constexpr mno::req<uint32_t> read_u32_be() noexcept {
+  [[nodiscard]] constexpr req<uint32_t> read_u32_be() noexcept {
     return read_u32().map(details::flip32);
   }
 };

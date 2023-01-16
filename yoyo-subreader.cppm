@@ -14,6 +14,12 @@ export class subreader : public reader {
   constexpr subreader(reader *o, unsigned start, unsigned len)
       : m_o(o), m_start(start), m_len(len) {}
 
+  [[nodiscard]] constexpr auto safe_read(unsigned d, auto fn) const noexcept {
+    return tellg()
+        .assert([this, d](auto g) { return g + d < m_len; }, "Buffer overflow")
+        .fmap([fn](auto dg) { return fn(); });
+  }
+
 public:
   constexpr subreader() = default;
 
@@ -22,35 +28,25 @@ public:
     return o->seekg(start).map([=] { return subreader{o, start, len}; });
   }
 
-  [[nodiscard]] constexpr bool eof() const noexcept override {
-    return tellg() >= m_len;
+  [[nodiscard]] constexpr req<bool> eof() const noexcept override {
+    return tellg().map([this](auto g) { return g >= m_len; });
   }
   [[nodiscard]] constexpr req<void> read(void *buffer,
                                          unsigned len) noexcept override {
-    if (tellg() + len > m_len)
-      return req<void>::failed("Buffer overflow");
-    return m_o->read(buffer, len);
+    return safe_read(len, [&] { return m_o->read(buffer, len); });
   }
   [[nodiscard]] constexpr req<void> read(uint8_t *buffer,
                                          unsigned len) noexcept override {
-    if (tellg() + len > m_len)
-      return req<void>::failed("Buffer overflow");
-    return m_o->read(buffer, len);
+    return safe_read(len, [&] { return m_o->read(buffer, len); });
   }
   [[nodiscard]] constexpr req<uint8_t> read_u8() noexcept override {
-    if (tellg() + sizeof(uint8_t) > m_len)
-      return req<uint8_t>::failed("Buffer overflow");
-    return m_o->read_u8();
+    return safe_read(sizeof(uint8_t), [this] { return m_o->read_u8(); });
   }
   [[nodiscard]] constexpr req<uint16_t> read_u16() noexcept override {
-    if (tellg() + sizeof(uint16_t) > m_len)
-      return req<uint16_t>::failed("Buffer overflow");
-    return m_o->read_u16();
+    return safe_read(sizeof(uint16_t), [this] { return m_o->read_u16(); });
   }
   [[nodiscard]] constexpr req<uint32_t> read_u32() noexcept override {
-    if (tellg() + sizeof(uint32_t) > m_len)
-      return req<uint32_t>::failed("Buffer overflow");
-    return m_o->read_u32();
+    return safe_read(sizeof(uint32_t), [this] { return m_o->read_u32(); });
   }
   [[nodiscard]] constexpr req<void> seekg(unsigned pos) {
     if (pos < 0)
@@ -65,13 +61,14 @@ public:
     case seek_mode::set:
       return seekg(pos);
     case seek_mode::current:
-      return seekg(m_o->tellg() - m_start + pos);
+      return m_o->tellg().fmap(
+          [&](auto g) { return seekg(g - m_start + pos); });
     case seek_mode::end:
       return seekg(m_len + pos);
     }
   }
-  [[nodiscard]] constexpr unsigned tellg() const noexcept override {
-    return m_o->tellg() - m_start;
+  [[nodiscard]] constexpr req<unsigned> tellg() const noexcept override {
+    return req<unsigned>{m_o->tellg() - m_start};
   }
 };
 } // namespace yoyo

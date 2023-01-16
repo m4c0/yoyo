@@ -4,6 +4,7 @@ module;
 export module yoyo:file_reader;
 import :reader;
 import hai;
+import missingno;
 
 namespace yoyo {
 class file_reader : public reader {
@@ -23,7 +24,9 @@ class file_reader : public reader {
 public:
   explicit file_reader(const char *name) : m_f{name, "rb"} {}
 
-  [[nodiscard]] bool eof() const noexcept override { return feof(*m_f) != 0; }
+  [[nodiscard]] req<bool> eof() const noexcept override {
+    return req<bool>{feof(*m_f) != 0};
+  }
 
   [[nodiscard]] req<void> read(void *buffer, unsigned len) noexcept override {
     return fread(buffer, len, 1, *m_f) == 1
@@ -37,9 +40,10 @@ public:
                : req<void>::failed("could not seek into file");
   }
 
-  [[nodiscard]] unsigned tellg() const noexcept override {
-    // TODO: make reader return errors, since ftell might fail
-    return ftell(*m_f);
+  [[nodiscard]] req<unsigned> tellg() const noexcept override {
+    unsigned res = ftell(*m_f);
+    return res >= 0 ? req<unsigned>{res}
+                    : req<unsigned>::failed("could not get file position");
   }
 };
 } // namespace yoyo

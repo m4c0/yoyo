@@ -35,6 +35,8 @@ protected:
 public:
   virtual ~reader() = default;
 
+  [[nodiscard]] virtual bool ready() const noexcept { return true; }
+
   [[nodiscard]] virtual req<bool> eof() const noexcept = 0;
   [[nodiscard]] virtual req<void> seekg(int pos, seek_mode mode) noexcept = 0;
   [[nodiscard]] virtual req<unsigned> tellg() const noexcept = 0;

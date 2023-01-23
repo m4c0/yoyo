@@ -1,8 +1,13 @@
 module;
-#include <stdint.h>
+#ifdef __APPLE__
+#include <new>
+#endif
 
 export module yoyo:ce_reader;
 import :reader;
+import traits;
+
+using namespace traits::ints;
 
 namespace yoyo {
 export template <auto N> class ce_reader : public reader {

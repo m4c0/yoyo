@@ -1,9 +1,9 @@
-module;
-#include <stdint.h>
-
 export module yoyo:subreader;
-import missingno;
 import :reader;
+import missingno;
+import traits;
+
+using namespace traits::ints;
 
 namespace yoyo {
 export class subreader : public reader {

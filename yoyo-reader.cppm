@@ -1,8 +1,13 @@
 module;
-#include <stdint.h>
+#ifdef __APPLE__
+#include <new>
+#endif
 
 export module yoyo:reader;
+import traits;
 import missingno;
+
+using namespace traits::ints;
 
 namespace yoyo {
 namespace details {

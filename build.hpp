@@ -2,6 +2,7 @@
 
 #include "../hai/build.hpp"
 #include "../missingno/build.hpp"
+#include "../traits/build.hpp"
 #include "ecow.hpp"
 
 auto yoyo() {
@@ -9,6 +10,7 @@ auto yoyo() {
   auto m = unit::create<mod>("yoyo");
   m->add_wsdep("hai", hai());
   m->add_wsdep("missingno", missingno());
+  m->add_wsdep("traits", traits());
   m->add_part("reader");
   m->add_part("writer");
   m->add_part("ce_reader");

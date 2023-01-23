@@ -1,14 +1,17 @@
 module;
 #include <stdio.h>
 
-export module yoyo:file_reader;
-import :reader;
+export module yoyo_libc:file_reader;
 import hai;
 import missingno;
+import yoyo;
 
 namespace yoyo {
+struct fcloser {
+  void operator()(FILE *f) { fclose(f); }
+};
 export class file_reader : public reader {
-  hai::c_file m_f;
+  hai::holder<FILE, fcloser> m_f;
 
   [[nodiscard]] static constexpr auto whence_of(seek_mode mode) noexcept {
     switch (mode) {
@@ -22,7 +25,7 @@ export class file_reader : public reader {
   }
 
 public:
-  explicit file_reader(const char *name) : m_f{name, "rb"} {}
+  explicit file_reader(const char *name) : m_f{fopen(name, "rb")} {}
 
   [[nodiscard]] req<bool> eof() const noexcept override {
     return req<bool>{feof(*m_f) != 0};

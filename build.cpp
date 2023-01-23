@@ -3,8 +3,13 @@
 using namespace ecow;
 
 int main(int argc, char **argv) {
-  auto tst = unit::create<exe>("tests");
+  auto all = unit::create<seq>("all");
+
+  auto tst = all->add_unit<exe>("tests");
   tst->add_ref(yoyo());
   tst->add_unit<>("subreader-test");
-  return run_main(tst, argc, argv);
+
+  all->add_ref(yoyo_libc());
+
+  return run_main(all, argc, argv);
 }

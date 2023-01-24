@@ -31,10 +31,16 @@ auto yoyo_stl() {
 
 auto yoyo_libc() {
   using namespace ecow;
-  auto m = unit::create<mod>("yoyo_libc");
+  auto y = yoyo();
+
+  auto s = unit::create<seq>("yoyo_all");
+  s->add_ref(y);
+
+  auto m = s->add_unit<mod>("yoyo_libc");
   m->add_wsdep("hai", hai());
   m->add_wsdep("missingno", missingno());
-  m->add_ref(yoyo());
+  m->add_ref(y);
   m->add_part("file_reader");
-  return m;
+
+  return s;
 }

@@ -76,5 +76,16 @@ public:
   [[nodiscard]] constexpr req<uint32_t> read_u32_be() noexcept {
     return read_u32().map(details::flip32);
   }
+
+  [[nodiscard]] constexpr virtual req<unsigned> size() noexcept {
+    auto og = tellg();
+    auto ng = seekg(0, seek_mode::end).fmap([this] { return tellg(); });
+    return mno::combine(
+               [this](auto og, auto ng) {
+                 return seekg(og).map([ng] { return ng; });
+               },
+               og, ng)
+        .fmap([](auto x) { return x; });
+  }
 };
 } // namespace yoyo

@@ -126,4 +126,19 @@ static_assert([] {
   return dat.seekg(4).fmap([&] { return dat.eof(); }).unwrap(false);
 }());
 
+// Test if we can find the size of a stream
+static_assert([] {
+  ce_reader dat("I'm fine");
+  return dat.seekg(3).fmap([&] { return dat.size(); }).unwrap(0) == 8;
+}());
+
+// Test if "size" doesn't change the head position
+static_assert([] {
+  ce_reader dat("I'm fine");
+  return dat.seekg(3)
+             .fmap([&] { return dat.size(); })
+             .fmap([&](auto) { return dat.tellg(); })
+             .unwrap(0) == 3;
+}());
+
 int main() {}

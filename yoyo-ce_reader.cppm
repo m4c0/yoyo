@@ -4,6 +4,7 @@ module;
 #endif
 
 export module yoyo:ce_reader;
+import :common;
 import :reader;
 import traits;
 

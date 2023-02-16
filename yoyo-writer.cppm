@@ -4,13 +4,10 @@ module;
 #endif
 
 export module yoyo:writer;
-import traits;
 import missingno;
-
-using namespace traits::ints;
+import :common;
 
 namespace yoyo {
-export enum class seek_mode { set, current, end };
 export class writer {
 public:
   [[nodiscard]] virtual bool ready() const noexcept { return true; }
@@ -33,6 +30,23 @@ public:
   template <typename T>
   [[nodiscard]] inline mno::req<void> write(T t) noexcept {
     return write(&t, sizeof(T));
+  }
+
+  [[nodiscard]] virtual mno::req<void> write_u8(uint8_t n) noexcept {
+    return write<uint8_t>(n);
+  }
+  [[nodiscard]] virtual mno::req<void> write_u16(uint16_t n) noexcept {
+    return write<uint16_t>(n);
+  }
+  [[nodiscard]] virtual mno::req<void> write_u32(uint32_t n) noexcept {
+    return write<uint32_t>(n);
+  }
+
+  [[nodiscard]] constexpr mno::req<void> write_u16_be(uint16_t n) noexcept {
+    return write_u16(details::flip16(n));
+  }
+  [[nodiscard]] constexpr mno::req<void> write_u32_be(uint32_t n) noexcept {
+    return write_u32(details::flip32(n));
   }
 };
 } // namespace yoyo

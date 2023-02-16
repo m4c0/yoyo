@@ -1,4 +1,5 @@
 export module yoyo:subreader;
+import :common;
 import :reader;
 import missingno;
 import traits;

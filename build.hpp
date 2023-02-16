@@ -11,6 +11,7 @@ auto yoyo() {
   m->add_wsdep("hai", hai());
   m->add_wsdep("missingno", missingno());
   m->add_wsdep("traits", traits());
+  m->add_part("common");
   m->add_part("reader");
   m->add_part("writer");
   m->add_part("ce_reader");

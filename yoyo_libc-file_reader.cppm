@@ -1,28 +1,12 @@
-module;
-#include <stdio.h>
-
 export module yoyo_libc:file_reader;
+import :file_common;
 import hai;
 import missingno;
 import yoyo;
 
 namespace yoyo {
-struct fcloser {
-  void operator()(FILE *f) { fclose(f); }
-};
 export class file_reader : public reader {
-  hai::holder<FILE, fcloser> m_f;
-
-  [[nodiscard]] static constexpr auto whence_of(seek_mode mode) noexcept {
-    switch (mode) {
-    case seek_mode::set:
-      return SEEK_SET;
-    case seek_mode::current:
-      return SEEK_CUR;
-    case seek_mode::end:
-      return SEEK_END;
-    }
-  }
+  file m_f;
 
 public:
   explicit file_reader(const char *name) : m_f{fopen(name, "rb")} {}

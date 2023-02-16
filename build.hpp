@@ -41,6 +41,7 @@ auto yoyo_libc() {
   m->add_wsdep("hai", hai());
   m->add_wsdep("missingno", missingno());
   m->add_ref(y);
+  m->add_part("file_common");
   m->add_part("file_reader");
   m->add_part("file_writer");
 

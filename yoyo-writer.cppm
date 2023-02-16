@@ -16,7 +16,7 @@ public:
                                              seek_mode mode) noexcept = 0;
   [[nodiscard]] virtual mno::req<unsigned> tellp() const noexcept = 0;
 
-  [[nodiscard]] constexpr mno::req<void> seekg(unsigned pos) noexcept {
+  [[nodiscard]] constexpr mno::req<void> seekp(unsigned pos) noexcept {
     return seekp(static_cast<int>(pos), seek_mode::set);
   }
 

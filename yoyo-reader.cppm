@@ -6,6 +6,7 @@ module;
 export module yoyo:reader;
 import :common;
 import missingno;
+import traits;
 
 namespace yoyo {
 export class reader {

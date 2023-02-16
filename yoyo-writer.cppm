@@ -4,8 +4,9 @@ module;
 #endif
 
 export module yoyo:writer;
-import missingno;
 import :common;
+import missingno;
+import traits;
 
 namespace yoyo {
 export class writer {

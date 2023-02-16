@@ -9,7 +9,10 @@ int main(int argc, char **argv) {
   tst->add_ref(yoyo());
   tst->add_unit<>("subreader-test");
 
-  all->add_unit<per_feat<seq>>("pf")->for_feature(posix).add_ref(yoyo_libc());
+  auto tar = all->add_unit<tool>("tar-test");
+  tar->add_wsdep("hai", hai());
+  tar->add_ref(yoyo_libc());
+  tar->add_unit("tar-test");
 
   return run_main(all, argc, argv);
 }

@@ -11,6 +11,8 @@ export class file_reader : public reader {
 public:
   explicit file_reader(const char *name) : m_f{fopen(name, "rb")} {}
 
+  [[nodiscard]] operator bool() const noexcept { return *m_f != nullptr; }
+
   [[nodiscard]] req<bool> eof() const noexcept override {
     return req<bool>{feof(*m_f) != 0};
   }

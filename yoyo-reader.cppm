@@ -3,17 +3,6 @@ import :common;
 import missingno;
 import traits;
 
-#ifndef _WIN32
-// This is only needed until clang fixes a linking bug. Without these, anything
-// deleting from base reader fails because of missing "hai::operator X"
-extern "C" void *malloc(traits::size_t);
-extern "C" void free(void *);
-void *operator new(traits::size_t count) { return malloc(count); }
-void *operator new[](traits::size_t count) { return malloc(count); }
-void operator delete(void *ptr) noexcept { return free(ptr); }
-void operator delete[](void *ptr) noexcept { return free(ptr); }
-#endif
-
 namespace yoyo {
 export class reader {
   friend class subreader;

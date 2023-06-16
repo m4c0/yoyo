@@ -15,6 +15,13 @@ export class subreader : public reader {
   constexpr subreader(reader *o, unsigned start, unsigned len)
       : m_o(o), m_start(start), m_len(len) {}
 
+  [[nodiscard]] constexpr auto safe_read_up_to(unsigned d,
+                                               auto fn) const noexcept {
+    return tellg().fmap([this, fn, d](auto g) {
+      auto len = g + d < m_len ? d : m_len - g;
+      return fn(len).map([len] { return len; });
+    });
+  }
   [[nodiscard]] constexpr auto safe_read(unsigned d, auto fn) const noexcept {
     return tellg()
         .assert([this, d](auto g) { return g + d < m_len; }, "Buffer overflow")
@@ -31,6 +38,16 @@ public:
 
   [[nodiscard]] constexpr req<bool> eof() const noexcept override {
     return tellg().map([this](auto g) { return g >= m_len; });
+  }
+  [[nodiscard]] constexpr req<unsigned>
+  read_up_to(void *buffer, unsigned len) noexcept override {
+    return safe_read_up_to(
+        len, [this, buffer](auto l) { return m_o->read(buffer, l); });
+  }
+  [[nodiscard]] constexpr req<unsigned>
+  read_up_to(uint8_t *buffer, unsigned len) noexcept override {
+    return safe_read_up_to(
+        len, [this, buffer](auto l) { return m_o->read(buffer, l); });
   }
   [[nodiscard]] constexpr req<void> read(void *buffer,
                                          unsigned len) noexcept override {

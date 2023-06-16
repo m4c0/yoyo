@@ -17,6 +17,8 @@ jobs:
         uses: m4c0/ecow/.github/actions/setup@main
       - name: 🧀 Prepare Deps
         uses: m4c0/yoyo/.github/actions/deps@main
+      - name: 🪵  Prepare Silog
+        uses: m4c0/silog/.github/actions/deps@main
       - name: 🔨 Build
         uses: m4c0/ecow/.github/actions/compile@main
         with:

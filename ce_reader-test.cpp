@@ -1,5 +1,6 @@
 module yoyo;
 import :ce_reader;
+import traits;
 
 using namespace yoyo;
 
@@ -139,6 +140,24 @@ static_assert([] {
              .fmap([&] { return dat.size(); })
              .fmap([&](auto) { return dat.tellg(); })
              .unwrap(0) == 3;
+}());
+
+// Test if can "read"
+static_assert([] {
+  uint8_t buf[2]{};
+  ce_reader dat("OK");
+  return dat.read(buf, 2)
+      .map([&] { return buf[0] == 'O' && buf[1] == 'K'; })
+      .unwrap(false);
+}());
+
+// Test if can "read up to" a size
+static_assert([] {
+  uint8_t buf[2]{};
+  ce_reader dat("OK");
+  return dat.read_up_to(buf, 5)
+      .map([&](auto len) { return len == 2 && buf[0] == 'O' && buf[1] == 'K'; })
+      .unwrap(false);
 }());
 
 int main() {}

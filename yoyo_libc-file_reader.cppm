@@ -17,6 +17,12 @@ public:
     return req<bool>{feof(*m_f) != 0};
   }
 
+  [[nodiscard]] req<unsigned> read_up_to(void *buffer,
+                                         unsigned len) noexcept override {
+    unsigned l = fread(buffer, 1, len, *m_f);
+    return l >= 0 ? req<unsigned>{l}
+                  : req<unsigned>::failed("could not read file");
+  }
   [[nodiscard]] req<void> read(void *buffer, unsigned len) noexcept override {
     return fread(buffer, len, 1, *m_f) == 1
                ? req<void>{}

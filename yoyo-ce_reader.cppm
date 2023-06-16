@@ -25,6 +25,17 @@ public:
     }
   }
 
+  [[nodiscard]] constexpr req<unsigned>
+  read_up_to(void * /*buffer*/, unsigned /*len*/) noexcept override {
+    return req<unsigned>::failed(
+        "CE doesn't support reading from generic pointer");
+  }
+  [[nodiscard]] constexpr req<unsigned>
+  read_up_to(uint8_t *buffer, unsigned len) noexcept override {
+    unsigned l = len + m_pos >= N ? N - m_pos : len;
+    return read(buffer, l).map([l] { return l; });
+  }
+
   [[nodiscard]] constexpr req<void> read(void * /*buffer*/,
                                          unsigned /*len*/) noexcept override {
     return req<void>::failed("CE doesn't support reading from generic pointer");

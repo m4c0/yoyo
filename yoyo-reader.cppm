@@ -27,6 +27,12 @@ public:
     return read(static_cast<void *>(buffer), len);
   }
   [[nodiscard]] virtual req<void> read(void *buffer, unsigned len) noexcept = 0;
+  [[nodiscard]] virtual req<unsigned> read_up_to(uint8_t *buffer,
+                                                 unsigned len) noexcept {
+    return read_up_to(static_cast<void *>(buffer), len);
+  }
+  [[nodiscard]] virtual req<unsigned> read_up_to(void *buffer,
+                                                 unsigned len) noexcept = 0;
 
   template <typename T> [[nodiscard]] inline req<T> read() noexcept {
     T res;

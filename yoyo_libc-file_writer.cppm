@@ -19,6 +19,12 @@ public:
                : mno::req<void>::failed("could not write file");
   }
 
+  [[nodiscard]] mno::req<void> writef(const char *fmt, auto... args) noexcept {
+    return fprintf(*m_f, fmt, args...) > 0
+               ? mno::req<void>{}
+               : mno::req<void>::failed("could not write file");
+  }
+
   [[nodiscard]] mno::req<void> seekp(int pos,
                                      seek_mode mode) noexcept override {
     return fseek(*m_f, pos, whence_of(mode)) == 0

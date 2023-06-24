@@ -14,6 +14,7 @@ using file = hai::holder<FILE, fcloser>;
 constexpr const auto fclose = ::fclose;
 constexpr const auto feof = ::feof;
 constexpr const auto fopen = ::fopen;
+constexpr const auto fprintf = ::fprintf;
 constexpr const auto fread = ::fread;
 constexpr const auto fseek = ::fseek;
 constexpr const auto ftell = ::ftell;

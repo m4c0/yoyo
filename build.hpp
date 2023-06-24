@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../hai/build.hpp"
+#include "../jute/build.hpp"
 #include "../missingno/build.hpp"
 #include "../traits/build.hpp"
 #include "ecow.hpp"
@@ -9,6 +10,7 @@ auto yoyo() {
   using namespace ecow;
   auto m = unit::create<mod>("yoyo");
   m->add_wsdep("hai", hai());
+  m->add_wsdep("jute", jute());
   m->add_wsdep("missingno", missingno());
   m->add_wsdep("traits", traits());
   m->add_part("common");

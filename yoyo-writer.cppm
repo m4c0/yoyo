@@ -5,6 +5,7 @@ module;
 
 export module yoyo:writer;
 import :common;
+import jute;
 import missingno;
 import traits;
 
@@ -31,6 +32,10 @@ public:
   template <typename T>
   [[nodiscard]] inline mno::req<void> write(T t) noexcept {
     return write(&t, sizeof(T));
+  }
+
+  [[nodiscard]] constexpr mno::req<void> write(jute::view v) noexcept {
+    return write(v.data(), v.size());
   }
 
   [[nodiscard]] virtual mno::req<void> write_u8(uint8_t n) noexcept {

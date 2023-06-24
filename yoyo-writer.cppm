@@ -37,6 +37,11 @@ public:
   [[nodiscard]] constexpr mno::req<void> write(jute::view v) noexcept {
     return write(v.data(), v.size());
   }
+  template <unsigned N>
+  [[nodiscard]] constexpr mno::req<void> write(jute::twine<N> t) noexcept {
+    auto v = t.cstr();
+    return write(v.data(), v.size());
+  }
 
   [[nodiscard]] virtual mno::req<void> write_u8(uint8_t n) noexcept {
     return write<uint8_t>(n);

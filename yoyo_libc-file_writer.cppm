@@ -11,6 +11,7 @@ export class file_writer : public writer {
 public:
   explicit file_writer(const char *name) : m_f{fopen(name, "wb")} {}
 
+  using writer::write;
   [[nodiscard]] mno::req<void> write(const void *buffer,
                                      unsigned len) noexcept override {
     return fwrite(buffer, len, 1, *m_f) == 1

@@ -159,5 +159,3 @@ static_assert([] {
       .map([&](auto len) { return len == 2 && buf[0] == 'O' && buf[1] == 'K'; })
       .unwrap(false);
 }());
-
-int main() {}

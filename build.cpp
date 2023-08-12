@@ -1,3 +1,4 @@
+#include "../hai/build.hpp"
 #include "../silog/build.hpp"
 #include "build.hpp"
 

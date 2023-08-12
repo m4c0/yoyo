@@ -3,7 +3,7 @@ module;
 #include <optional>
 
 export module yoyo_stl:istr_reader;
-import :reader;
+import yoyo;
 
 namespace yoyo {
 export class istr_reader : public reader {

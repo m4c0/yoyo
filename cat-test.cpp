@@ -1,4 +1,4 @@
-import yoyo_libc;
+import yoyo;
 import silog;
 
 int main() {

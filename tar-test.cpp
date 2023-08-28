@@ -1,5 +1,5 @@
 import hai;
-import yoyo_libc;
+import yoyo;
 
 struct header {
   char name[100];

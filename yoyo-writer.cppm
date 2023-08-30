@@ -1,8 +1,3 @@
-module;
-#ifdef __APPLE__
-#include <new>
-#endif
-
 export module yoyo:writer;
 import :common;
 import jute;

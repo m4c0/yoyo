@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ecow.hpp"
+#include "../ecow/ecow.hpp"
 
 auto yoyo() {
   using namespace ecow;

@@ -1,3 +1,5 @@
+#pragma leco tool
+
 import yoyo;
 import silog;
 

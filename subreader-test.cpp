@@ -1,3 +1,5 @@
+#pragma leco tool
+
 import yoyo;
 
 using namespace yoyo;
@@ -133,3 +135,5 @@ static_assert([] {
   return h.read(buf).map(fail).unwrap(true) && buf[0] == '1' && buf[1] == '2' &&
          buf[2] == '3' && buf[3] == '4' && buf[4] == '5';
 });
+
+int main() {}

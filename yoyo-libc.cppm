@@ -16,7 +16,14 @@ using file = hai::holder<FILE, fcloser>;
 
 constexpr const auto fclose = ::fclose;
 constexpr const auto feof = ::feof;
-constexpr const auto fopen = ::fopen;
+constexpr const auto fopen = [](auto name, auto mode) {
+#ifdef _WIN32
+  FILE *res;
+  return ::fopen_s(&res, name, mode) ? res : nullptr;
+#else
+  return ::fopen(name, mode);
+#endif
+};
 constexpr const auto fprintf = ::fprintf;
 constexpr const auto fread = ::fread;
 constexpr const auto fseek = ::fseek;

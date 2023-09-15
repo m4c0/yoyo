@@ -19,7 +19,7 @@ constexpr const auto feof = ::feof;
 constexpr const auto fopen = [](auto name, auto mode) {
 #ifdef _WIN32
   FILE *res;
-  return ::fopen_s(&res, name, mode) ? res : nullptr;
+  return ::fopen_s(&res, name, mode) ? nullptr : res;
 #else
   return ::fopen(name, mode);
 #endif

@@ -16,11 +16,16 @@ public:
   static constexpr auto len = 4;
 
   constexpr holder() : holder(start_pos, len) {}
+  constexpr holder(unsigned len)
+      : m_sub{m_reader.seekg(start_pos).fmap(
+            [&] { return subreader::create(&m_reader, len); })} {}
   constexpr holder(unsigned start, unsigned len)
       : m_sub(subreader::seek_and_create(&m_reader, start, len)) {}
 
-  constexpr auto &sub() { return m_sub; }
-  constexpr const auto &underlying() const { return m_reader; }
+  constexpr auto &sub() {
+    return m_sub; }
+  constexpr const auto &underlying() const {
+    return m_reader; }
 
   constexpr auto assert_position(bool eof, unsigned pos) {
     return m_sub.map(
@@ -59,6 +64,7 @@ static_assert(holder{holder::whole_len + 1, 1}
 
 // can tell current position from start
 static_assert(holder{}.assert_position(false, 0).unwrap(false));
+static_assert(holder{2}.assert_position(false, 0).unwrap(false));
 
 // doesn't seek before limit
 static_assert([] {

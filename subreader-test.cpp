@@ -55,6 +55,14 @@ static_assert([] {
       .map([&](auto) { return h.underlying().tellg() == 2; })
       .unwrap(false);
 }());
+static_assert([] {
+  holder h{2, 1};
+  unsigned char buf[4];
+  return h.sub()
+      .fmap([&](auto s) { return s.read(buf, 1); })
+      .map([&] { return buf[0] == 'i'; })
+      .unwrap(false);
+}());
 
 // creates an invalid instance if ctor can't seek
 static_assert(holder{holder::whole_len + 1, 1}

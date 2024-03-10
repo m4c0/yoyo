@@ -42,6 +42,7 @@ public:
   [[nodiscard]] constexpr req<unsigned> size() noexcept override {
     return req<unsigned>{m_len};
   }
+  [[nodiscard]] constexpr unsigned raw_size() const noexcept { return m_len; }
 
   [[nodiscard]] constexpr req<bool> eof() const noexcept override {
     return tellg().map([this](auto g) { return g >= m_len; });

@@ -25,6 +25,10 @@ public:
     }
   }
 
+  [[nodiscard]] constexpr req<unsigned> size() noexcept override {
+    return req<unsigned>{static_cast<unsigned>(N)};
+  }
+
   [[nodiscard]] constexpr req<unsigned>
   read_up_to(void * /*buffer*/, unsigned /*len*/) noexcept override {
     return req<unsigned>::failed(

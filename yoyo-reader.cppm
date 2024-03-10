@@ -56,7 +56,7 @@ public:
     return read_u32().map(details::flip32);
   }
 
-  [[nodiscard]] constexpr req<unsigned> size() noexcept {
+  [[nodiscard]] virtual constexpr req<unsigned> size() noexcept {
     auto og = tellg();
     auto ng = seekg(0, seek_mode::end).fmap([this] { return tellg(); });
     return mno::combine(

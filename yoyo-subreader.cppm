@@ -74,6 +74,9 @@ public:
   [[nodiscard]] constexpr req<uint32_t> read_u32() noexcept override {
     return safe_read(sizeof(uint32_t), [this] { return m_o->read_u32(); });
   }
+  [[nodiscard]] constexpr req<uint64_t> read_u64() noexcept override {
+    return safe_read(sizeof(uint64_t), [this] { return m_o->read_u64(); });
+  }
   [[nodiscard]] constexpr req<void> seekg(unsigned pos) {
     if (pos < 0)
       return req<void>::failed("Buffer overflow");

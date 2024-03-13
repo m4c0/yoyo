@@ -1,8 +1,3 @@
-module;
-#ifdef __APPLE__
-#include <new>
-#endif
-
 export module yoyo:ce_reader;
 import :common;
 import :reader;
@@ -73,6 +68,15 @@ public:
     return read_u16().fmap([this](auto b) {
       return read_u16().map(
           [b](auto a) -> uint32_t { return (a << u16_bitsize) | b; });
+    });
+  }
+  [[nodiscard]] constexpr req<uint64_t> read_u64() noexcept override {
+    constexpr const auto u32_bitsize = 32U;
+
+    return read_u32().fmap([this](auto b) {
+      return read_u32().map([b](auto a) -> uint64_t {
+        return (static_cast<long>(a) << u32_bitsize) | b;
+      });
     });
   }
   [[nodiscard]] constexpr req<bool> eof() const noexcept override {

@@ -23,5 +23,12 @@ namespace details {
 static constexpr const auto test_be = 0xaabbccddU;
 static constexpr const auto test_le = 0xddccbbaaU;
 static_assert(flip32(test_be) == test_le);
+
+[[nodiscard]] static constexpr uint64_t flip64(uint64_t u64) noexcept {
+  constexpr const auto u32_bitsize = 32U;
+  uint32_t ab = flip32(static_cast<uint32_t>(u64));
+  uint32_t cd = flip32(static_cast<uint32_t>(u64 >> u32_bitsize));
+  return (static_cast<uint64_t>(ab) << u32_bitsize) | cd;
+}
 } // namespace details
 } // namespace yoyo

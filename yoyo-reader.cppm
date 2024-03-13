@@ -48,12 +48,18 @@ public:
   [[nodiscard]] virtual req<uint32_t> read_u32() noexcept {
     return read<uint32_t>();
   }
+  [[nodiscard]] virtual req<uint64_t> read_u64() noexcept {
+    return read<uint64_t>();
+  }
 
   [[nodiscard]] constexpr req<uint16_t> read_u16_be() noexcept {
     return read_u16().map(details::flip16);
   }
   [[nodiscard]] constexpr req<uint32_t> read_u32_be() noexcept {
     return read_u32().map(details::flip32);
+  }
+  [[nodiscard]] constexpr req<uint64_t> read_u64_be() noexcept {
+    return read_u64().map(details::flip64);
   }
 
   [[nodiscard]] virtual constexpr req<unsigned> size() noexcept {

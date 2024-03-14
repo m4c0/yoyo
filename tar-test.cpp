@@ -36,7 +36,7 @@ inline void set_octal(char (&cs)[N], unsigned val, unsigned len = N - 1) {
 void failure(const char *msg) { throw 0; }
 
 inline void add_file(const char *name, yoyo::writer *out) {
-  yoyo::file_reader in{name};
+  auto in = yoyo::file_reader::open(name).take(failure);
   auto size = in.size().take(failure);
   auto buf = hai::holder<char[]>::make(size);
   in.read(*buf, size).take(failure);

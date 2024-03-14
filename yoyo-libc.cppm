@@ -33,12 +33,17 @@ static inline FILE *fopen = [](auto name, auto mode) {
 }
 
 export class file_reader : public reader {
-  file m_f;
+  file m_f{};
 
 public:
-  explicit file_reader(const char *name) : m_f{fopen(name, "rb")} {}
+  constexpr file_reader() = default;
+  explicit constexpr file_reader(FILE *f) : m_f{f} {}
 
-  [[nodiscard]] operator bool() const noexcept { return *m_f != nullptr; }
+  static req<file_reader> open(const char *name) {
+    auto f = fopen(name, "rb");
+    return f == nullptr ? req<file_reader>::failed("failed to open file")
+                        : req<file_reader>{file_reader{f}};
+  }
 
   [[nodiscard]] req<bool> eof() const noexcept override {
     return req<bool>{feof(*m_f) != 0};

@@ -15,10 +15,10 @@ struct fcloser {
 using file = hai::holder<FILE, fcloser>;
 
 #ifdef _WIN32
-static inline FILE *fopen = [](auto name, auto mode) {
+static inline FILE *fopen(auto name, auto mode) {
   FILE *res;
   return ::fopen_s(&res, name, mode) ? nullptr : res;
-};
+}
 #endif
 
 [[nodiscard]] inline constexpr auto whence_of(seek_mode mode) noexcept {

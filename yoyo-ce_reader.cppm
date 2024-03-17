@@ -75,7 +75,7 @@ public:
 
     return read_u32().fmap([this](auto b) {
       return read_u32().map([b](auto a) -> uint64_t {
-        return (static_cast<long>(a) << u32_bitsize) | b;
+        return (static_cast<uint64_t>(a) << u32_bitsize) | b;
       });
     });
   }

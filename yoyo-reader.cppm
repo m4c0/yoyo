@@ -39,6 +39,10 @@ public:
     return read(&res, sizeof(res)).map([&] { return res; });
   }
 
+  [[nodiscard]] virtual req<int8_t> read_s8() noexcept {
+    return read<int8_t>();
+  }
+
   [[nodiscard]] virtual req<uint8_t> read_u8() noexcept {
     return read<uint8_t>();
   }

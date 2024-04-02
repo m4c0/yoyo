@@ -39,7 +39,7 @@ public:
   constexpr file_reader() = default;
   explicit constexpr file_reader(FILE *f) : m_f{f} {}
 
-  static req<file_reader> open(const char *name) {
+  [[nodiscard]] static req<file_reader> open(const char *name) {
     auto f = fopen(name, "rb");
     return f == nullptr ? req<file_reader>::failed("failed to open file")
                         : req<file_reader>{file_reader{f}};

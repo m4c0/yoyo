@@ -7,6 +7,8 @@ import traits;
 namespace yoyo {
 export class writer {
 public:
+  virtual ~writer() = default;
+
   [[nodiscard]] virtual bool ready() const noexcept { return true; }
 
   [[nodiscard]] virtual mno::req<void> seekp(int pos,

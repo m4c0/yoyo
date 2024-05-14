@@ -75,10 +75,17 @@ public:
 };
 
 export class file_writer : public writer {
-  file m_f;
+  file m_f{};
 
 public:
-  explicit file_writer(const char *name) : m_f{fopen(name, "wb")} {}
+  constexpr file_writer() = default;
+  explicit constexpr file_writer(FILE *f) : m_f{f} {}
+
+  [[nodiscard]] static mno::req<file_writer> open(const char *name) {
+    auto f = fopen(name, "wb");
+    return f == nullptr ? mno::req<file_writer>::failed("failed to open file")
+                        : mno::req<file_writer>{file_writer{f}};
+  }
 
   using writer::write;
   [[nodiscard]] mno::req<void> write(const void *buffer,

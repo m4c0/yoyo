@@ -44,7 +44,7 @@ public:
   [[nodiscard]] constexpr req<uint64_t> size() noexcept override {
     return req<uint64_t>{m_len};
   }
-  [[nodiscard]] constexpr unsigned raw_size() const noexcept { return m_len; }
+  [[nodiscard]] constexpr uint64_t raw_size() const noexcept { return m_len; }
 
   [[nodiscard]] constexpr req<bool> eof() const noexcept override {
     return tellg().map([this](auto g) { return g >= m_len; });
@@ -79,7 +79,7 @@ public:
   [[nodiscard]] constexpr req<uint64_t> read_u64() noexcept override {
     return safe_read(sizeof(uint64_t), [this] { return m_o->read_u64(); });
   }
-  [[nodiscard]] constexpr req<void> seekg(unsigned pos) {
+  [[nodiscard]] constexpr req<void> seekg(uint64_t pos) {
     if (pos < 0)
       return req<void>::failed("Buffer overflow");
     if (pos > m_len)

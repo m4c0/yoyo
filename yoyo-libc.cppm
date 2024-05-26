@@ -1,5 +1,14 @@
 module;
+#define _FILE_OFFSET_BITS 64
 #include <stdio.h>
+
+#ifdef LECO_TARGET_WINDOWS
+#define ftell64 _ftelli64
+#define fseek64 _fseeki64
+#else
+#define ftell64 ftello64
+#define fseek64 fseeko64
+#endif
 
 export module yoyo:libc;
 import :common;
@@ -65,7 +74,7 @@ public:
   }
 
   [[nodiscard]] req<void> seekg(int64_t pos, seek_mode mode) noexcept override {
-    return fseek(*m_f, pos, whence_of(mode)) == 0
+    return fseek64(*m_f, pos, whence_of(mode)) == 0
                ? req<void>{}
                : req<void>::failed("could not seek into file");
   }
@@ -73,7 +82,7 @@ public:
   [[nodiscard]] req<uint64_t> tellg() const noexcept override {
     // This might be a problem on platforms with sizeof(long) == 4 dealing with
     // files larger than ~2GB.
-    long res = ftell(*m_f);
+    int64_t res = ftell64(*m_f);
     return res >= 0 ? req<uint64_t>{static_cast<uint64_t>(res)}
                     : req<uint64_t>::failed("could not get file position");
   }

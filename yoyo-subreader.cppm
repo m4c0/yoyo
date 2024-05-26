@@ -9,16 +9,18 @@ using namespace traits::ints;
 namespace yoyo {
 export class subreader : public reader {
   reader *m_o;
-  unsigned m_start;
-  unsigned m_len;
+  uint64_t m_start;
+  uint64_t m_len;
 
-  constexpr subreader(reader *o, unsigned start, unsigned len)
-      : m_o(o), m_start(start), m_len(len) {}
+  constexpr subreader(reader *o, uint64_t start, uint64_t len)
+      : m_o(o)
+      , m_start(start)
+      , m_len(len) {}
 
   [[nodiscard]] constexpr auto safe_read_up_to(unsigned d,
                                                auto fn) const noexcept {
     return tellg().fmap([this, fn, d](auto g) {
-      auto len = g + d < m_len ? d : m_len - g;
+      auto len = static_cast<unsigned>(g + d < m_len ? d : m_len - g);
       return fn(len).map([len] { return len; });
     });
   }
@@ -39,8 +41,8 @@ public:
     return o->seekg(start).map([=] { return subreader{o, start, len}; });
   }
 
-  [[nodiscard]] constexpr req<unsigned> size() noexcept override {
-    return req<unsigned>{m_len};
+  [[nodiscard]] constexpr req<uint64_t> size() noexcept override {
+    return req<uint64_t>{m_len};
   }
   [[nodiscard]] constexpr unsigned raw_size() const noexcept { return m_len; }
 
@@ -84,7 +86,7 @@ public:
       return req<void>::failed("Buffer underflow");
     return m_o->seekg(m_start + pos);
   }
-  [[nodiscard]] constexpr req<void> seekg(int pos,
+  [[nodiscard]] constexpr req<void> seekg(int64_t pos,
                                           seek_mode mode) noexcept override {
     switch (mode) {
     case seek_mode::set:
@@ -96,8 +98,8 @@ public:
       return seekg(m_len + pos);
     }
   }
-  [[nodiscard]] constexpr req<unsigned> tellg() const noexcept override {
-    return req<unsigned>{m_o->tellg() - m_start};
+  [[nodiscard]] constexpr req<uint64_t> tellg() const noexcept override {
+    return req<uint64_t>{m_o->tellg() - m_start};
   }
 };
 } // namespace yoyo

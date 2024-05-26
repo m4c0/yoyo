@@ -7,6 +7,9 @@ import :reader;
 import :writer;
 import hai;
 import missingno;
+import traits;
+
+using namespace traits::ints;
 
 namespace yoyo {
 struct fcloser {
@@ -61,16 +64,18 @@ public:
                : req<void>::failed("could not read file");
   }
 
-  [[nodiscard]] req<void> seekg(int pos, seek_mode mode) noexcept override {
+  [[nodiscard]] req<void> seekg(int64_t pos, seek_mode mode) noexcept override {
     return fseek(*m_f, pos, whence_of(mode)) == 0
                ? req<void>{}
                : req<void>::failed("could not seek into file");
   }
 
-  [[nodiscard]] req<unsigned> tellg() const noexcept override {
-    unsigned res = ftell(*m_f);
-    return res >= 0 ? req<unsigned>{res}
-                    : req<unsigned>::failed("could not get file position");
+  [[nodiscard]] req<uint64_t> tellg() const noexcept override {
+    // This might be a problem on platforms with sizeof(long) == 4 dealing with
+    // files larger than ~2GB.
+    long res = ftell(*m_f);
+    return res >= 0 ? req<uint64_t>{static_cast<uint64_t>(res)}
+                    : req<uint64_t>::failed("could not get file position");
   }
 };
 

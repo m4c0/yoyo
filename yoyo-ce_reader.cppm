@@ -20,8 +20,8 @@ public:
     }
   }
 
-  [[nodiscard]] constexpr req<unsigned> size() noexcept override {
-    return req<unsigned>{static_cast<unsigned>(N)};
+  [[nodiscard]] constexpr req<uint64_t> size() noexcept override {
+    return req<uint64_t>{static_cast<uint64_t>(N)};
   }
 
   [[nodiscard]] constexpr req<unsigned>
@@ -90,7 +90,7 @@ public:
     m_pos = pos;
     return {};
   }
-  [[nodiscard]] constexpr req<void> seekg(int pos,
+  [[nodiscard]] constexpr req<void> seekg(int64_t pos,
                                           seek_mode mode) noexcept override {
     switch (mode) {
     case seek_mode::set:
@@ -101,8 +101,8 @@ public:
       return seekg(N + pos);
     }
   }
-  [[nodiscard]] constexpr req<unsigned> tellg() const noexcept override {
-    return req<unsigned>{m_pos};
+  [[nodiscard]] constexpr req<uint64_t> tellg() const noexcept override {
+    return req<uint64_t>{m_pos};
   }
 };
 export template <typename... Tp> ce_reader(Tp...) -> ce_reader<sizeof...(Tp)>;

@@ -3,6 +3,8 @@ import :common;
 import missingno;
 import traits;
 
+using namespace traits::ints;
+
 namespace yoyo {
 export class reader {
   friend class subreader;
@@ -16,11 +18,12 @@ public:
   [[nodiscard]] virtual bool ready() const noexcept { return true; }
 
   [[nodiscard]] virtual req<bool> eof() const noexcept = 0;
-  [[nodiscard]] virtual req<void> seekg(int pos, seek_mode mode) noexcept = 0;
-  [[nodiscard]] virtual req<unsigned> tellg() const noexcept = 0;
+  [[nodiscard]] virtual req<void> seekg(int64_t pos,
+                                        seek_mode mode) noexcept = 0;
+  [[nodiscard]] virtual req<uint64_t> tellg() const noexcept = 0;
 
-  [[nodiscard]] constexpr req<void> seekg(unsigned pos) noexcept {
-    return seekg(static_cast<int>(pos), seek_mode::set);
+  [[nodiscard]] constexpr req<void> seekg(uint64_t pos) noexcept {
+    return seekg(static_cast<int64_t>(pos), seek_mode::set);
   }
 
   [[nodiscard]] virtual req<void> read(uint8_t *buffer, unsigned len) noexcept {
@@ -66,7 +69,7 @@ public:
     return read_u64().map(details::flip64);
   }
 
-  [[nodiscard]] virtual constexpr req<unsigned> size() noexcept {
+  [[nodiscard]] virtual constexpr req<uint64_t> size() noexcept {
     auto og = tellg();
     auto ng = seekg(0, seek_mode::end).fmap([this] { return tellg(); });
     return mno::combine(

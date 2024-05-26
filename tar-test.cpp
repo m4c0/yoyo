@@ -74,7 +74,7 @@ inline void add_file(const char *name, yoyo::writer *out) {
 }
 
 int main() {
-  yoyo::file_writer out{"out/tar-test.tar"};
+  auto out = yoyo::file_writer::open("out/tar-test.tar").take(failure);
   add_file("build.cpp", &out);
   add_file("subreader-test.cpp", &out);
 

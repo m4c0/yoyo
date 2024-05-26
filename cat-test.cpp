@@ -10,9 +10,9 @@ int main() {
       .map([&](auto sz) {
         silog::log(silog::info, "Got %d bytes: [%s]", sz, buf);
       })
-      .take([](auto err) { silog::log(silog::error, "Failed: %s", err); });
+      .log_error();
   yoyo::file_reader::open("cat-test.cpp")
       .fmap([&](auto &&f) { return f.read_up_to(buf, 10240); })
       .map([&](auto sz) { silog::log(silog::info, "Got %d bytes", sz); })
-      .take([](auto err) { silog::log(silog::error, "Failed: %s", err); });
+      .log_error();
 }

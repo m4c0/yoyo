@@ -1,6 +1,7 @@
 #pragma leco tool
 
 import hai;
+import jute;
 import yoyo;
 
 struct header {
@@ -33,7 +34,7 @@ inline void set_octal(char (&cs)[N], unsigned val, unsigned len = N - 1) {
   cs[len] = ' ';
 }
 
-void failure(const char *msg) { throw 0; }
+void failure(jute::view) { throw 0; }
 
 inline void add_file(const char *name, yoyo::writer *out) {
   auto in = yoyo::file_reader::open(name).take(failure);

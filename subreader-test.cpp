@@ -124,12 +124,14 @@ static_assert([] {
 
 // subreader of a dead subreader
 static_assert([] {
-  auto r = ce_reader{"testing"};
-  return yoyo::subreader::create(&r, 4)
-      .fmap([](auto sr1) { return yoyo::subreader::create(&sr1, 2); })
-      .fmap([](auto sr2) { return sr2.read_u32(); })
+  auto r = ce_reader{"testing subs"};
+  return yoyo::subreader::create(&r, 8)
+      .fmap([](auto sr1) { return yoyo::subreader::create(&sr1, 6); })
+      .fmap(
+          [](auto sr2) { return yoyo::subreader::seek_and_create(&sr2, 2, 4); })
+      .fmap([](auto sr3) { return sr3.read_u32(); })
       .unwrap(0);
-}() > 0);
+}() != 0);
 
 // reads
 static_assert([] {

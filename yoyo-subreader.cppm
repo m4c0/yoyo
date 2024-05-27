@@ -33,6 +33,17 @@ export class subreader : public reader {
 public:
   constexpr subreader() = default;
 
+  [[nodiscard]] static constexpr req<subreader> create(subreader *o,
+                                                       unsigned len) {
+    return o->m_o->tellg().map(
+        [=](auto start) { return subreader{o->m_o, start, len}; });
+  }
+  [[nodiscard]] static constexpr req<subreader>
+  seek_and_create(subreader *o, unsigned start, unsigned len) {
+    return o->m_o->seekg(start).map(
+        [=] { return subreader{o->m_o, start, len}; });
+  }
+
   [[nodiscard]] static constexpr req<subreader> create(reader *o,
                                                        unsigned len) {
     return o->tellg().map([=](auto start) { return subreader{o, start, len}; });

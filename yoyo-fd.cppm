@@ -7,7 +7,12 @@ export module yoyo:fd;
 import :common;
 import :reader;
 import :writer;
+import jute;
 import missingno;
+import traits;
+
+using i64 = traits::ints::int64_t;
+using u64 = traits::ints::uint64_t;
 
 namespace yoyo {
 export class fd_reader : public reader {
@@ -30,12 +35,12 @@ public:
   [[nodiscard]] mno::req<bool> eof() const noexcept override {
     return mno::req{m_eof};
   }
-  [[nodiscard]] mno::req<void> seekg(int pos,
+  [[nodiscard]] mno::req<void> seekg(i64 pos,
                                      seek_mode mode) noexcept override {
     return mno::req<void>::failed("unsupported");
   }
-  [[nodiscard]] mno::req<unsigned> tellg() const noexcept override {
-    return mno::req<unsigned>::failed("unsupported");
+  [[nodiscard]] mno::req<u64> tellg() const noexcept override {
+    return mno::req<u64>::failed("unsupported");
   }
   [[nodiscard]] mno::req<void> read(void *buffer,
                                     unsigned len) noexcept override {

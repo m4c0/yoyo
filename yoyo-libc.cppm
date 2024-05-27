@@ -6,8 +6,8 @@ module;
 #define ftell64 _ftelli64
 #define fseek64 _fseeki64
 #else
-#define ftell64 ftello64
-#define fseek64 fseeko64
+#define ftell64 ftello
+#define fseek64 fseeko
 #endif
 
 export module yoyo:libc;
@@ -18,7 +18,8 @@ import hai;
 import missingno;
 import traits;
 
-using namespace traits::ints;
+using i64 = traits::ints::int64_t;
+using u64 = traits::ints::uint64_t;
 
 namespace yoyo {
 struct fcloser {
@@ -73,18 +74,18 @@ public:
                : req<void>::failed("could not read file");
   }
 
-  [[nodiscard]] req<void> seekg(int64_t pos, seek_mode mode) noexcept override {
+  [[nodiscard]] req<void> seekg(i64 pos, seek_mode mode) noexcept override {
     return fseek64(*m_f, pos, whence_of(mode)) == 0
                ? req<void>{}
                : req<void>::failed("could not seek into file");
   }
 
-  [[nodiscard]] req<uint64_t> tellg() const noexcept override {
+  [[nodiscard]] req<u64> tellg() const noexcept override {
     // This might be a problem on platforms with sizeof(long) == 4 dealing with
     // files larger than ~2GB.
-    int64_t res = ftell64(*m_f);
-    return res >= 0 ? req<uint64_t>{static_cast<uint64_t>(res)}
-                    : req<uint64_t>::failed("could not get file position");
+    i64 res = ftell64(*m_f);
+    return res >= 0 ? req<u64>{static_cast<u64>(res)}
+                    : req<u64>::failed("could not get file position");
   }
 };
 

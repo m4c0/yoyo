@@ -60,8 +60,7 @@ public:
     if (rd != -1)
       return mno::req{static_cast<unsigned>(rd)};
 
-    // let it leak until req can "own" the message
-    return mno::req<unsigned>::failed(strdup(strerror(errno)));
+    return mno::req<unsigned>::failed(jute::view::unsafe(strerror(errno)));
   }
 };
 
@@ -83,8 +82,7 @@ public:
     if (-1 != ::write(m_fd, buffer, len))
       return {};
 
-    // let it leak until req can "own" the message
-    return mno::req<void>::failed(strdup(strerror(errno)));
+    return mno::req<void>::failed(jute::view::unsafe(strerror(errno)));
   }
 };
 } // namespace yoyo

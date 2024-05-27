@@ -122,6 +122,15 @@ static_assert([] {
       .unwrap(false);
 }());
 
+// subreader of a dead subreader
+static_assert([] {
+  auto r = ce_reader{"testing"};
+  return yoyo::subreader::create(&r, 4)
+      .fmap([](auto sr1) { return yoyo::subreader::create(&sr1, 2); })
+      .fmap([](auto sr2) { return sr2.read_u32(); })
+      .unwrap(0);
+}() > 0);
+
 // reads
 static_assert([] {
   char buf[] = "12";

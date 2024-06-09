@@ -45,6 +45,15 @@ public:
   [[nodiscard]] virtual req<int8_t> read_s8() noexcept {
     return read<int8_t>();
   }
+  [[nodiscard]] virtual req<int16_t> read_s16() noexcept {
+    return read<int16_t>();
+  }
+  [[nodiscard]] virtual req<int32_t> read_s32() noexcept {
+    return read<int32_t>();
+  }
+  [[nodiscard]] virtual req<int64_t> read_s64() noexcept {
+    return read<int64_t>();
+  }
 
   [[nodiscard]] virtual req<uint8_t> read_u8() noexcept {
     return read<uint8_t>();

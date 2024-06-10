@@ -91,7 +91,7 @@ public:
   [[nodiscard]] constexpr req<uint64_t> read_u64() noexcept override {
     return safe_read(sizeof(uint64_t), [this] { return m_o->read_u64(); });
   }
-  [[nodiscard]] constexpr req<void> seekg(uint64_t pos) {
+  [[nodiscard]] constexpr req<void> seekg(int64_t pos) {
     if (pos < 0)
       return req<void>::failed("Attempt to seek before start of range");
     if (pos > m_len)
@@ -104,8 +104,9 @@ public:
     case seek_mode::set:
       return seekg(pos);
     case seek_mode::current:
-      return m_o->tellg().fmap(
-          [&](auto g) { return seekg(g - m_start + pos); });
+      return m_o->tellg().fmap([&](auto g) {
+        return seekg(g - static_cast<int64_t>(m_start) + pos);
+      });
     case seek_mode::end:
       return seekg(m_len + pos);
     }

@@ -93,9 +93,9 @@ public:
   }
   [[nodiscard]] constexpr req<void> seekg(uint64_t pos) {
     if (pos < 0)
-      return req<void>::failed("Buffer overflow");
+      return req<void>::failed("Attempt to seek before start of range");
     if (pos > m_len)
-      return req<void>::failed("Buffer underflow");
+      return req<void>::failed("Attempt to seek past end of range");
     return m_o->seekg(m_start + pos);
   }
   [[nodiscard]] constexpr req<void> seekg(int64_t pos,

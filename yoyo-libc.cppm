@@ -1,6 +1,8 @@
 module;
 #define _FILE_OFFSET_BITS 64
+#include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 #ifdef LECO_TARGET_WINDOWS
 #define ftell64 _ftelli64
@@ -15,6 +17,7 @@ import :common;
 import :reader;
 import :writer;
 import hai;
+import jute;
 import missingno;
 import traits;
 
@@ -45,6 +48,14 @@ static inline FILE *fopen(auto name, auto mode) {
   }
 }
 
+[[nodiscard]] inline jute::heap perror(jute::view msg) {
+  char buf[1024]{};
+  if (strerror_r(errno, buf, sizeof(buf)) != 0) {
+    return msg;
+  }
+  return msg + ": " + jute::view::unsafe(buf);
+}
+
 export class file_reader : public reader {
   file m_f{};
 
@@ -66,12 +77,12 @@ public:
                                          unsigned len) noexcept override {
     unsigned l = fread(buffer, 1, len, *m_f);
     return l >= 0 ? req<unsigned>{l}
-                  : req<unsigned>::failed("could not read file");
+                  : req<unsigned>::failed(perror("could not read file"));
   }
   [[nodiscard]] req<void> read(void *buffer, unsigned len) noexcept override {
     return fread(buffer, len, 1, *m_f) == 1
                ? req<void>{}
-               : req<void>::failed("could not read file");
+               : req<void>::failed(perror("could not read file"));
   }
 
   [[nodiscard]] req<void> seekg(i64 pos, seek_mode mode) noexcept override {

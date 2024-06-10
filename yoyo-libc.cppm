@@ -80,9 +80,13 @@ public:
                   : req<unsigned>::failed(perror("could not read file"));
   }
   [[nodiscard]] req<void> read(void *buffer, unsigned len) noexcept override {
-    return fread(buffer, len, 1, *m_f) == 1
-               ? req<void>{}
-               : req<void>::failed(perror("could not read file"));
+    if (fread(buffer, len, 1, *m_f) == 1)
+      return req<void>{};
+
+    if (feof(*m_f))
+      return req<void>::failed("EOF while reading file");
+
+    return req<void>::failed(perror("could not read file"));
   }
 
   [[nodiscard]] req<void> seekg(i64 pos, seek_mode mode) noexcept override {

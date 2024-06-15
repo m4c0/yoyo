@@ -50,7 +50,7 @@ static inline FILE *fopen(auto name, auto mode) {
 
 [[nodiscard]] inline jute::heap perror(jute::view msg) {
   char buf[1024]{};
-  if (strerror_r(errno, buf, sizeof(buf)) != 0) {
+  if (strerror_s(buf, sizeof(buf), errno) != 0) {
     return msg;
   }
   return msg + ": " + jute::view::unsafe(buf);

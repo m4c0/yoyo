@@ -117,6 +117,13 @@ public:
                         : mno::req<file_writer>{file_writer{f}};
   }
 
+  [[nodiscard]] static mno::req<file_writer> append(const char *name) {
+    auto f = fopen(name, "ab");
+    return f == nullptr ? mno::req<file_writer>::failed(
+                              "failed to open file for appending")
+                        : mno::req<file_writer>{file_writer{f}};
+  }
+
   using writer::write;
   [[nodiscard]] mno::req<void> write(const void *buffer,
                                      unsigned len) noexcept override {

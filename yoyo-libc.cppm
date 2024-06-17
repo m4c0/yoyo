@@ -35,6 +35,7 @@ static inline FILE *fopen(auto name, auto mode) {
   FILE *res;
   return ::fopen_s(&res, name, mode) ? nullptr : res;
 }
+#define strerror_r(err, buf, len) strerror_s(buf, len, err)
 #endif
 
 [[nodiscard]] inline constexpr auto whence_of(seek_mode mode) noexcept {
@@ -50,7 +51,7 @@ static inline FILE *fopen(auto name, auto mode) {
 
 [[nodiscard]] inline jute::heap perror(jute::view msg) {
   char buf[1024]{};
-  if (strerror_s(buf, sizeof(buf), errno) != 0) {
+  if (strerror_r(errno, buf, sizeof(buf)) != 0) {
     return msg;
   }
   return msg + ": " + jute::view::unsafe(buf);

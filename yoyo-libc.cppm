@@ -38,7 +38,7 @@ static inline FILE *fopen(auto name, auto mode) {
 #define strerror_r(err, buf, len) strerror_s(buf, len, err)
 #endif
 
-[[nodiscard]] inline constexpr auto whence_of(seek_mode mode) noexcept {
+[[nodiscard]] inline constexpr auto whence_of(seek_mode mode) {
   switch (mode) {
   case seek_mode::set:
     return SEEK_SET;
@@ -70,17 +70,16 @@ public:
                         : req<file_reader>{file_reader{f}};
   }
 
-  [[nodiscard]] req<bool> eof() const noexcept override {
+  [[nodiscard]] req<bool> eof() const override {
     return req<bool>{feof(*m_f) != 0};
   }
 
-  [[nodiscard]] req<unsigned> read_up_to(void *buffer,
-                                         unsigned len) noexcept override {
+  [[nodiscard]] req<unsigned> read_up_to(void *buffer, unsigned len) override {
     unsigned l = fread(buffer, 1, len, *m_f);
     return l >= 0 ? req<unsigned>{l}
                   : req<unsigned>::failed(perror("could not read file"));
   }
-  [[nodiscard]] req<void> read(void *buffer, unsigned len) noexcept override {
+  [[nodiscard]] req<void> read(void *buffer, unsigned len) override {
     if (fread(buffer, len, 1, *m_f) == 1)
       return req<void>{};
 
@@ -90,13 +89,13 @@ public:
     return req<void>::failed(perror("could not read file"));
   }
 
-  [[nodiscard]] req<void> seekg(i64 pos, seek_mode mode) noexcept override {
+  [[nodiscard]] req<void> seekg(i64 pos, seek_mode mode) override {
     return fseek64(*m_f, pos, whence_of(mode)) == 0
                ? req<void>{}
                : req<void>::failed("could not seek into file");
   }
 
-  [[nodiscard]] req<u64> tellg() const noexcept override {
+  [[nodiscard]] req<u64> tellg() const override {
     // This might be a problem on platforms with sizeof(long) == 4 dealing with
     // files larger than ~2GB.
     i64 res = ftell64(*m_f);
@@ -127,26 +126,25 @@ public:
 
   using writer::write;
   [[nodiscard]] mno::req<void> write(const void *buffer,
-                                     unsigned len) noexcept override {
+                                     unsigned len) override {
     return fwrite(buffer, len, 1, *m_f) == 1
                ? mno::req<void>{}
                : mno::req<void>::failed("could not write file");
   }
 
-  [[nodiscard]] mno::req<void> writef(const char *fmt, auto... args) noexcept {
+  [[nodiscard]] mno::req<void> writef(const char *fmt, auto... args) {
     return fprintf(*m_f, fmt, args...) > 0
                ? mno::req<void>{}
                : mno::req<void>::failed("could not write file");
   }
 
-  [[nodiscard]] mno::req<void> seekp(int pos,
-                                     seek_mode mode) noexcept override {
+  [[nodiscard]] mno::req<void> seekp(int pos, seek_mode mode) override {
     return fseek(*m_f, pos, whence_of(mode)) == 0
                ? mno::req<void>{}
                : mno::req<void>::failed("could not seek into file");
   }
 
-  [[nodiscard]] mno::req<unsigned> tellp() const noexcept override {
+  [[nodiscard]] mno::req<unsigned> tellp() const override {
     unsigned res = ftell(*m_f);
     return res >= 0 ? mno::req<unsigned>{res}
                     : mno::req<unsigned>::failed("could not get file position");

@@ -20,27 +20,27 @@ public:
     }
   }
 
-  [[nodiscard]] constexpr req<uint64_t> size() noexcept override {
+  [[nodiscard]] constexpr req<uint64_t> size() override {
     return req<uint64_t>{static_cast<uint64_t>(N)};
   }
 
-  [[nodiscard]] constexpr req<unsigned>
-  read_up_to(void * /*buffer*/, unsigned /*len*/) noexcept override {
+  [[nodiscard]] constexpr req<unsigned> read_up_to(void * /*buffer*/,
+                                                   unsigned /*len*/) override {
     return req<unsigned>::failed(
         "CE doesn't support reading from generic pointer");
   }
-  [[nodiscard]] constexpr req<unsigned>
-  read_up_to(uint8_t *buffer, unsigned len) noexcept override {
+  [[nodiscard]] constexpr req<unsigned> read_up_to(uint8_t *buffer,
+                                                   unsigned len) override {
     unsigned l = len + m_pos >= N ? N - m_pos : len;
     return read(buffer, l).map([l] { return l; });
   }
 
   [[nodiscard]] constexpr req<void> read(void * /*buffer*/,
-                                         unsigned /*len*/) noexcept override {
+                                         unsigned /*len*/) override {
     return req<void>::failed("CE doesn't support reading from generic pointer");
   }
   [[nodiscard]] constexpr req<void> read(uint8_t *buffer,
-                                         unsigned len) noexcept override {
+                                         unsigned len) override {
     req<void> res;
     for (auto i = 0U; i < len; i++) {
       res = res.fmap([this] { return read_u8(); }).map([&](auto b) {
@@ -49,12 +49,12 @@ public:
     }
     return res;
   }
-  [[nodiscard]] constexpr req<uint8_t> read_u8() noexcept override {
+  [[nodiscard]] constexpr req<uint8_t> read_u8() override {
     return eof()
         .assert([](auto eof) { return !eof; }, "Buffer underflow")
         .map([&](auto) { return m_data[m_pos++]; });
   }
-  [[nodiscard]] constexpr req<uint16_t> read_u16() noexcept override {
+  [[nodiscard]] constexpr req<uint16_t> read_u16() override {
     constexpr const auto u8_bitsize = 8U;
 
     return read_u8().fmap([this](auto b) {
@@ -62,7 +62,7 @@ public:
           [b](auto a) -> uint16_t { return (a << u8_bitsize) | b; });
     });
   }
-  [[nodiscard]] constexpr req<uint32_t> read_u32() noexcept override {
+  [[nodiscard]] constexpr req<uint32_t> read_u32() override {
     constexpr const auto u16_bitsize = 16U;
 
     return read_u16().fmap([this](auto b) {
@@ -70,7 +70,7 @@ public:
           [b](auto a) -> uint32_t { return (a << u16_bitsize) | b; });
     });
   }
-  [[nodiscard]] constexpr req<uint64_t> read_u64() noexcept override {
+  [[nodiscard]] constexpr req<uint64_t> read_u64() override {
     constexpr const auto u32_bitsize = 32U;
 
     return read_u32().fmap([this](auto b) {
@@ -79,7 +79,7 @@ public:
       });
     });
   }
-  [[nodiscard]] constexpr req<bool> eof() const noexcept override {
+  [[nodiscard]] constexpr req<bool> eof() const override {
     return req<bool>{m_pos >= N};
   }
   [[nodiscard]] constexpr req<void> seekg(unsigned pos) {
@@ -91,7 +91,7 @@ public:
     return {};
   }
   [[nodiscard]] constexpr req<void> seekg(int64_t pos,
-                                          seek_mode mode) noexcept override {
+                                          seek_mode mode) override {
     switch (mode) {
     case seek_mode::set:
       return seekg(pos);
@@ -101,7 +101,7 @@ public:
       return seekg(N + pos);
     }
   }
-  [[nodiscard]] constexpr req<uint64_t> tellg() const noexcept override {
+  [[nodiscard]] constexpr req<uint64_t> tellg() const override {
     return req<uint64_t>{m_pos};
   }
 };

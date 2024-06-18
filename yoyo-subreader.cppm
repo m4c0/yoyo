@@ -17,14 +17,13 @@ export class subreader : public reader {
       , m_start(start)
       , m_len(len) {}
 
-  [[nodiscard]] constexpr auto safe_read_up_to(unsigned d,
-                                               auto fn) const noexcept {
+  [[nodiscard]] constexpr auto safe_read_up_to(unsigned d, auto fn) const {
     return tellg().fmap([this, fn, d](auto g) {
       auto len = static_cast<unsigned>(g + d < m_len ? d : m_len - g);
       return fn(len).map([len] { return len; });
     });
   }
-  [[nodiscard]] constexpr auto safe_read(unsigned d, auto fn) const noexcept {
+  [[nodiscard]] constexpr auto safe_read(unsigned d, auto fn) const {
     return tellg()
         .assert([this, d](auto g) { return g + d <= m_len; }, "Buffer overflow")
         .fmap([fn](auto dg) { return fn(); });
@@ -59,42 +58,41 @@ public:
     return o->seekg(start).map([=] { return subreader{o, start, len}; });
   }
 
-  [[nodiscard]] constexpr req<uint64_t> size() noexcept override {
+  [[nodiscard]] constexpr req<uint64_t> size() override {
     return req<uint64_t>{m_len};
   }
-  [[nodiscard]] constexpr uint64_t raw_size() const noexcept { return m_len; }
+  [[nodiscard]] constexpr uint64_t raw_size() const { return m_len; }
 
-  [[nodiscard]] constexpr req<bool> eof() const noexcept override {
+  [[nodiscard]] constexpr req<bool> eof() const override {
     return tellg().map([this](auto g) { return g >= m_len; });
   }
-  [[nodiscard]] constexpr req<unsigned>
-  read_up_to(void *buffer, unsigned len) noexcept override {
+  [[nodiscard]] constexpr req<unsigned> read_up_to(void *buffer,
+                                                   unsigned len) override {
     return safe_read_up_to(
         len, [this, buffer](auto l) { return m_o->read(buffer, l); });
   }
-  [[nodiscard]] constexpr req<unsigned>
-  read_up_to(uint8_t *buffer, unsigned len) noexcept override {
+  [[nodiscard]] constexpr req<unsigned> read_up_to(uint8_t *buffer,
+                                                   unsigned len) override {
     return safe_read_up_to(
         len, [this, buffer](auto l) { return m_o->read(buffer, l); });
   }
-  [[nodiscard]] constexpr req<void> read(void *buffer,
-                                         unsigned len) noexcept override {
+  [[nodiscard]] constexpr req<void> read(void *buffer, unsigned len) override {
     return safe_read(len, [&] { return m_o->read(buffer, len); });
   }
   [[nodiscard]] constexpr req<void> read(uint8_t *buffer,
-                                         unsigned len) noexcept override {
+                                         unsigned len) override {
     return safe_read(len, [&] { return m_o->read(buffer, len); });
   }
-  [[nodiscard]] constexpr req<uint8_t> read_u8() noexcept override {
+  [[nodiscard]] constexpr req<uint8_t> read_u8() override {
     return safe_read(sizeof(uint8_t), [this] { return m_o->read_u8(); });
   }
-  [[nodiscard]] constexpr req<uint16_t> read_u16() noexcept override {
+  [[nodiscard]] constexpr req<uint16_t> read_u16() override {
     return safe_read(sizeof(uint16_t), [this] { return m_o->read_u16(); });
   }
-  [[nodiscard]] constexpr req<uint32_t> read_u32() noexcept override {
+  [[nodiscard]] constexpr req<uint32_t> read_u32() override {
     return safe_read(sizeof(uint32_t), [this] { return m_o->read_u32(); });
   }
-  [[nodiscard]] constexpr req<uint64_t> read_u64() noexcept override {
+  [[nodiscard]] constexpr req<uint64_t> read_u64() override {
     return safe_read(sizeof(uint64_t), [this] { return m_o->read_u64(); });
   }
   [[nodiscard]] constexpr req<void> seekg(int64_t pos) {
@@ -105,7 +103,7 @@ public:
     return m_o->seekg(m_start + pos);
   }
   [[nodiscard]] constexpr req<void> seekg(int64_t pos,
-                                          seek_mode mode) noexcept override {
+                                          seek_mode mode) override {
     switch (mode) {
     case seek_mode::set:
       return seekg(pos);
@@ -117,7 +115,7 @@ public:
       return seekg(m_len + pos);
     }
   }
-  [[nodiscard]] constexpr req<uint64_t> tellg() const noexcept override {
+  [[nodiscard]] constexpr req<uint64_t> tellg() const override {
     return req<uint64_t>{m_o->tellg() - m_start};
   }
 };

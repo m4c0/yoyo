@@ -52,13 +52,13 @@ public:
   [[nodiscard]] virtual req<uint64_t> read_u64() { return read<uint64_t>(); }
 
   [[nodiscard]] constexpr req<uint16_t> read_u16_be() {
-    return read_u16().map(details::flip16);
+    return read_u16().map(flip16);
   }
   [[nodiscard]] constexpr req<uint32_t> read_u32_be() {
-    return read_u32().map(details::flip32);
+    return read_u32().map(flip32);
   }
   [[nodiscard]] constexpr req<uint64_t> read_u64_be() {
-    return read_u64().map(details::flip64);
+    return read_u64().map(flip64);
   }
 
   [[nodiscard]] virtual constexpr req<uint64_t> size() {

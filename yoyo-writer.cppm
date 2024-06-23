@@ -49,10 +49,10 @@ public:
   }
 
   [[nodiscard]] constexpr mno::req<void> write_u16_be(uint16_t n) {
-    return write_u16(details::flip16(n));
+    return write_u16(flip16(n));
   }
   [[nodiscard]] constexpr mno::req<void> write_u32_be(uint32_t n) {
-    return write_u32(details::flip32(n));
+    return write_u32(flip32(n));
   }
 };
 } // namespace yoyo

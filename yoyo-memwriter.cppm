@@ -40,6 +40,7 @@ public:
     return mno::req{m_pos};
   }
   [[nodiscard]] constexpr auto raw_pos() const { return m_pos; }
+  [[nodiscard]] constexpr auto raw_size() const { return m_size; }
 
   [[nodiscard]] virtual mno::req<void> write(const void *buffer, unsigned len) {
     if (len + m_pos > m_size)

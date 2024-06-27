@@ -39,6 +39,7 @@ public:
   [[nodiscard]] virtual mno::req<unsigned> tellp() const {
     return mno::req{m_pos};
   }
+  [[nodiscard]] constexpr auto raw_pos() const { return m_pos; }
 
   [[nodiscard]] virtual mno::req<void> write(const void *buffer, unsigned len) {
     if (len + m_pos > m_size)

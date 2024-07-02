@@ -88,6 +88,7 @@ public:
 
     return req<void>::failed(perror("could not read file"));
   }
+  using reader::read;
 
   [[nodiscard]] req<void> seekg(i64 pos, seek_mode mode) override {
     return fseek64(*m_f, pos, whence_of(mode)) == 0

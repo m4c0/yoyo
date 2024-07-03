@@ -17,7 +17,8 @@ public:
       : m_buffer{buf.begin()}
       , m_size{buf.size()} {}
 
-  [[nodiscard]] virtual mno::req<void> seekp(int pos, seek_mode mode) {
+  [[nodiscard]] constexpr mno::req<void> seekp(int pos,
+                                               seek_mode mode) override {
     switch (mode) {
     case seek_mode::set:
       break;
@@ -36,19 +37,30 @@ public:
     m_pos = pos;
     return {};
   }
-  [[nodiscard]] virtual mno::req<unsigned> tellp() const {
+  [[nodiscard]] constexpr mno::req<unsigned> tellp() const override {
     return mno::req{m_pos};
   }
   [[nodiscard]] constexpr auto raw_pos() const { return m_pos; }
   [[nodiscard]] constexpr auto raw_size() const { return m_size; }
 
-  [[nodiscard]] virtual mno::req<void> write(const void *buffer, unsigned len) {
+  [[nodiscard]] mno::req<void> write(const void *buffer,
+                                     unsigned len) override {
     if (len + m_pos > m_size)
       return mno::req<void>::failed("attempt of writing past end of string");
 
     auto buf = static_cast<const uint8_t *>(buffer);
     for (auto i = 0; i < len; i++) {
       m_buffer[m_pos++] = *buf++;
+    }
+    return {};
+  }
+  [[nodiscard]] constexpr mno::req<void> write(const uint8_t *buffer,
+                                               unsigned len) override {
+    if (len + m_pos > m_size)
+      return mno::req<void>::failed("attempt of writing past end of string");
+
+    for (auto i = 0; i < len; i++) {
+      m_buffer[m_pos++] = *buffer++;
     }
     return {};
   }

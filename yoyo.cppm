@@ -20,6 +20,10 @@ export import :libc;
 using namespace traits::ints;
 
 export namespace yoyo {
+constexpr auto read(void *data, unsigned size) {
+  return [=](auto &r) { return r.read(data, size); };
+}
+
 constexpr auto write_u8(uint8_t n) {
   return [=](auto &w) { return w.write_u8(n); };
 }
@@ -30,6 +34,9 @@ constexpr auto write_u32_be(uint16_t n) {
   return [=](auto &w) { return w.write_u32_be(n); };
 }
 constexpr auto write(const uint8_t *data, unsigned size) {
+  return [=](auto &w) { return w.write(data, size); };
+}
+constexpr auto write(const void *data, unsigned size) {
   return [=](auto &w) { return w.write(data, size); };
 }
 constexpr auto seek(int n, yoyo::seek_mode m) {

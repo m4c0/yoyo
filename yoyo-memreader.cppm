@@ -98,5 +98,7 @@ public:
   [[nodiscard]] constexpr req<uint64_t> tellg() const override {
     return req<uint64_t>{m_pos};
   }
+
+  [[nodiscard]] constexpr auto raw_pos() const { return m_pos; }
 };
 } // namespace yoyo

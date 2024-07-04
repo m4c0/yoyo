@@ -30,6 +30,9 @@ constexpr auto write_u8(uint8_t n) {
 constexpr auto write_u16(uint16_t n) {
   return [=](auto &w) { return w.write_u16(n); };
 }
+constexpr auto write_u32(uint16_t n) {
+  return [=](auto &w) { return w.write_u32(n); };
+}
 constexpr auto write_u32_be(uint16_t n) {
   return [=](auto &w) { return w.write_u32_be(n); };
 }

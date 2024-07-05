@@ -30,11 +30,23 @@ constexpr auto write_u8(uint8_t n) {
 constexpr auto write_u16(uint16_t n) {
   return [=](auto &w) { return w.write_u16(n); };
 }
-constexpr auto write_u32(uint16_t n) {
+constexpr auto write_u32(uint32_t n) {
   return [=](auto &w) { return w.write_u32(n); };
 }
-constexpr auto write_u32_be(uint16_t n) {
+constexpr auto write_u64(uint64_t n) {
+  return [=](auto &w) { return w.write_u64(n); };
+}
+constexpr auto write_u8_be(uint8_t n) {
+  return [=](auto &w) { return w.write_u8_be(n); };
+}
+constexpr auto write_u16_be(uint16_t n) {
+  return [=](auto &w) { return w.write_u16_be(n); };
+}
+constexpr auto write_u32_be(uint32_t n) {
   return [=](auto &w) { return w.write_u32_be(n); };
+}
+constexpr auto write_u64_be(uint64_t n) {
+  return [=](auto &w) { return w.write_u64_be(n); };
 }
 constexpr auto write(const uint8_t *data, unsigned size) {
   return [=](auto &w) { return w.write(data, size); };

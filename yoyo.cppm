@@ -54,6 +54,7 @@ constexpr auto write(const uint8_t *data, unsigned size) {
 constexpr auto write(const void *data, unsigned size) {
   return [=](auto &w) { return w.write(data, size); };
 }
+
 constexpr auto seek(int n, yoyo::seek_mode m) {
   return [=](auto &w) { return w.seekp(n, m); };
 }

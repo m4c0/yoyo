@@ -24,6 +24,16 @@ constexpr auto read(void *data, unsigned size) {
   return [=](auto &r) { return r.read(data, size); };
 }
 
+constexpr auto until_eof(auto &&fn) {
+  return [&](auto &r) {
+    mno::req<void> res{};
+    while (res.is_valid() && !r.eof().unwrap(false)) {
+      res = fn(r);
+    }
+    return res;
+  };
+};
+
 constexpr auto write_u8(uint8_t n) {
   return [=](auto &w) { return w.write_u8(n); };
 }

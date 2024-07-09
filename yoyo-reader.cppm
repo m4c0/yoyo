@@ -28,6 +28,9 @@ public:
   [[nodiscard]] virtual req<void> read(uint8_t *buffer, unsigned len) {
     return read(static_cast<void *>(buffer), len);
   }
+  [[nodiscard]] virtual req<void> read(int8_t *buffer, unsigned len) {
+    return read(static_cast<void *>(buffer), len);
+  }
   [[nodiscard]] virtual req<void> read(void *buffer, unsigned len) = 0;
   [[nodiscard]] virtual req<unsigned> read_up_to(uint8_t *buffer,
                                                  unsigned len) {

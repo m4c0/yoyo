@@ -49,6 +49,16 @@ public:
     }
     return res;
   }
+  [[nodiscard]] constexpr req<void> read(int8_t *buffer,
+                                         unsigned len) override {
+    req<void> res;
+    for (auto i = 0U; i < len; i++) {
+      res = res.fmap([this] { return read_u8(); }).map([&](auto b) {
+        buffer[i] = b;
+      });
+    }
+    return res;
+  }
   [[nodiscard]] constexpr req<uint8_t> read_u8() override {
     return eof()
         .assert([](auto eof) { return !eof; }, "Buffer underflow")

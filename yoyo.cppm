@@ -26,6 +26,9 @@ constexpr auto read(void *data, unsigned size) {
 constexpr auto read_u16(uint16_t &n) {
   return [&](auto &r) { return r.read_u16().map([&](auto v) { n = v; }); };
 }
+constexpr auto read_u32(uint32_t &n) {
+  return [&](auto &r) { return r.read_u32().map([&](auto v) { n = v; }); };
+}
 
 constexpr auto until_eof(auto &&fn) {
   return [&](auto &r) {

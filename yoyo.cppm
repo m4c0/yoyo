@@ -23,6 +23,9 @@ export namespace yoyo {
 constexpr auto read(void *data, unsigned size) {
   return [=](auto &r) { return r.read(data, size); };
 }
+constexpr auto read_u16(uint16_t &n) {
+  return [&](auto &r) { return r.read_u16().map([&](auto v) { n = v; }); };
+}
 
 constexpr auto until_eof(auto &&fn) {
   return [&](auto &r) {

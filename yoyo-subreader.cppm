@@ -25,7 +25,8 @@ export class subreader : public reader {
   }
   [[nodiscard]] constexpr auto safe_read(unsigned d, auto fn) const {
     return tellg()
-        .assert([this, d](auto g) { return g + d <= m_len; }, "Buffer overflow")
+        .assert([this, d](auto g) { return g + d <= m_len; },
+                "Attempt of reading more bytes than available")
         .fmap([fn](auto dg) { return fn(); });
   }
 

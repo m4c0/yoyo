@@ -71,7 +71,10 @@ constexpr auto write(const void *data, unsigned size) {
   return [=](auto &w) { return w.write(data, size); };
 }
 
-constexpr auto seek(int n, yoyo::seek_mode m) {
+constexpr auto seekg(int n, yoyo::seek_mode m) {
+  return [=](auto &w) { return w.seekg(n, m); };
+}
+constexpr auto seekp(int n, yoyo::seek_mode m) {
   return [=](auto &w) { return w.seekp(n, m); };
 }
 } // namespace yoyo

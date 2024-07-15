@@ -90,6 +90,16 @@ public:
   }
   using reader::read;
 
+  [[nodiscard]] req<void> readline(char *buffer, unsigned len) {
+    if (fgets(buffer, len, *m_f))
+      return req<void>{};
+
+    if (feof(*m_f))
+      return req<void>::failed("EOF while reading line from file");
+
+    return req<void>::failed(perror("could not read a line from file"));
+  }
+
   [[nodiscard]] req<void> seekg(i64 pos, seek_mode mode) override {
     return fseek64(*m_f, pos, whence_of(mode)) == 0
                ? req<void>{}

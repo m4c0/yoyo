@@ -36,7 +36,7 @@ constexpr auto until_eof(auto &&fn) {
     while (res.is_valid() && !r.eof().unwrap(false)) {
       res = fn(r);
     }
-    return res;
+    return r.eof().unwrap(false) ? mno::req{} : res;
   };
 };
 

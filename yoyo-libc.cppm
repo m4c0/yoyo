@@ -86,7 +86,7 @@ public:
     if (feof(*m_f))
       return req<void>::failed("EOF while reading file");
 
-    return req<void>::failed(perror("could not read file"));
+    return req<void>::failed(perror("could not read a block from file"));
   }
   using reader::read;
 

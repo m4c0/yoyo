@@ -30,6 +30,10 @@ constexpr auto read_u32(uint32_t &n) {
   return [&](auto &r) { return r.read_u32().map([&](auto v) { n = v; }); };
 }
 
+constexpr auto size() {
+  return [](auto &r) { return r.size(); };
+}
+
 constexpr auto until_eof(auto &&fn) {
   return [&](auto &r) {
     mno::req<void> res{};

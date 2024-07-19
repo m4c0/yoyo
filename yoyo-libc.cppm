@@ -69,6 +69,9 @@ public:
     return f == nullptr ? req<file_reader>::failed("failed to open file")
                         : req<file_reader>{file_reader{f}};
   }
+  [[nodiscard]] static req<file_reader> std_in() {
+    return req<file_reader>{file_reader{stdin}};
+  }
 
   [[nodiscard]] req<bool> eof() const override {
     return req<bool>{feof(*m_f) != 0};

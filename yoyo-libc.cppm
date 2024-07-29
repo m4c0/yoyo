@@ -65,8 +65,11 @@ public:
   explicit constexpr file_reader(FILE *f) : m_f{f} {}
 
   [[nodiscard]] static req<file_reader> open(const char *name) {
+    using namespace jute::literals;
+
     auto f = fopen(name, "rb");
-    return f == nullptr ? req<file_reader>::failed("failed to open file")
+    return f == nullptr ? req<file_reader>::failed("failed to open file: "_s +
+                                                   jute::view::unsafe(name))
                         : req<file_reader>{file_reader{f}};
   }
   [[nodiscard]] static req<file_reader> std_in() {
@@ -126,9 +129,13 @@ public:
   explicit constexpr file_writer(FILE *f) : m_f{f} {}
 
   [[nodiscard]] static mno::req<file_writer> open(const char *name) {
+    using namespace jute::literals;
+
     auto f = fopen(name, "wb");
-    return f == nullptr ? mno::req<file_writer>::failed("failed to open file")
-                        : mno::req<file_writer>{file_writer{f}};
+    return f == nullptr
+               ? mno::req<file_writer>::failed("failed to open file: "_s +
+                                               jute::view::unsafe(name))
+               : mno::req<file_writer>{file_writer{f}};
   }
 
   [[nodiscard]] static mno::req<file_writer> append(const char *name) {

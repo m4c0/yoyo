@@ -7,6 +7,7 @@ export import :memwriter;
 export import :reader;
 export import :subreader;
 export import :writer;
+import hai;
 import traits;
 
 #ifdef __APPLE__
@@ -43,6 +44,12 @@ constexpr auto until_eof(auto &&fn) {
     return r.eof().unwrap(false) ? mno::req{} : res;
   };
 };
+constexpr auto slurp(yoyo::reader &rdr) {
+  return rdr.size().fmap([&](unsigned sz) {
+    hai::array<char> buf{sz};
+    return rdr.read(buf.begin(), sz).map([&] { return traits::move(buf); });
+  });
+}
 
 constexpr auto write_u8(uint8_t n) {
   return [=](auto &w) { return w.write_u8(n); };

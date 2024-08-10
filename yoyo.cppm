@@ -2,6 +2,7 @@ export module yoyo;
 export import missingno;
 export import :ce_reader;
 export import :common;
+export import :libc;
 export import :memreader;
 export import :memwriter;
 export import :reader;
@@ -12,10 +13,6 @@ import traits;
 
 #ifdef __APPLE__
 export import :fd;
-#endif
-
-#ifndef __wasm__
-export import :libc;
 #endif
 
 using namespace traits::ints;

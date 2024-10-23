@@ -12,6 +12,7 @@ export class memreader : public reader {
   unsigned m_pos{};
 
 public:
+  constexpr memreader() = default;
   constexpr explicit memreader(const uint8_t *d, unsigned s)
       : m_data{d}
       , m_size{s} {}

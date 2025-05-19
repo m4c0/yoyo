@@ -140,7 +140,7 @@ static_assert([] {
       .read(buf)
       .map([&] { return buf[0] == 'i' && buf[1] == 's'; })
       .unwrap(false);
-});
+}());
 
 // reads all
 static_assert([] {
@@ -151,7 +151,7 @@ static_assert([] {
         return buf[0] == 'i' && buf[1] == 's' && buf[2] == ' ' && buf[3] == 'a';
       })
       .unwrap(false);
-});
+}());
 
 // doesnt read past limit
 static_assert([] {
@@ -159,6 +159,6 @@ static_assert([] {
   holder h;
   return h.read(buf).map(fail).unwrap(true) && buf[0] == '1' && buf[1] == '2' &&
          buf[2] == '3' && buf[3] == '4' && buf[4] == '5';
-});
+}());
 
 int main() {}

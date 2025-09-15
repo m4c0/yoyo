@@ -56,7 +56,7 @@ public:
     if (rd != -1)
       return mno::req{static_cast<unsigned>(rd)};
 
-    return mno::req<unsigned>::failed(jute::view::unsafe(strerror(errno)));
+    return mno::req<unsigned>::failed(jute::heap{jute::view::unsafe(strerror(errno))});
   }
 };
 
@@ -77,7 +77,7 @@ public:
     if (-1 != ::write(m_fd, buffer, len))
       return {};
 
-    return mno::req<void>::failed(jute::view::unsafe(strerror(errno)));
+    return mno::req<void>::failed(jute::heap{jute::view::unsafe(strerror(errno))});
   }
 };
 } // namespace yoyo

@@ -54,7 +54,7 @@ static inline FILE *fopen(auto name, auto mode) {
   if (strerror_r(errno, buf, sizeof(buf)) != 0) {
     return jute::heap { msg };
   }
-  return msg + ": " + jute::view::unsafe(buf);
+  return (msg + ": " + jute::view::unsafe(buf)).heap();
 }
 
 export class file_reader : public reader {
@@ -68,8 +68,8 @@ public:
     using namespace jute::literals;
 
     auto f = fopen(name, "rb");
-    return f == nullptr ? req<file_reader>::failed("failed to open file: "_s +
-                                                   jute::view::unsafe(name))
+    return f == nullptr ? req<file_reader>::failed(("failed to open file: "_s +
+                                                   jute::view::unsafe(name)).heap())
                         : req<file_reader>{file_reader{f}};
   }
   [[nodiscard]] static req<file_reader> std_in() {
@@ -133,8 +133,8 @@ public:
 
     auto f = fopen(name, "wb");
     return f == nullptr
-               ? mno::req<file_writer>::failed("failed to open file: "_s +
-                                               jute::view::unsafe(name))
+               ? mno::req<file_writer>::failed(("failed to open file: "_s +
+                                               jute::view::unsafe(name)).heap())
                : mno::req<file_writer>{file_writer{f}};
   }
 
